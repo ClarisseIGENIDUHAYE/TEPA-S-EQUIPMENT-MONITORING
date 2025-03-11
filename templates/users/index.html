@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEPA'S Equipment Monitoring - Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #0077cc;
+            font-family: Arial, sans-serif;
+        }
+        .login-container {
+            display: flex;
+            min-height: 85vh;
+            padding: 20px;
+        }
+        .form-section {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 900px;
+            padding: 30px;
+            margin: 0 auto;
+        }
+        .welcome-section {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 40px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-left: 20px;
+        }
+        .input-field {
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 12px;
+            width: 100%;
+            margin-top: 5px;
+            font-size: 1rem;
+        }
+        .btn-primary {
+            background-color: #0077cc;
+            color: white;
+            padding: 12px;
+            border-radius: 4px;
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 1rem;
+        }
+        .btn-primary:hover {
+            background-color: #005fa3;
+        }
+        .icon-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 18px;
+            margin-bottom: 6px;
+            font-size: 1rem;
+        }
+        .circle-icon {
+            background-color: #7deb34;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #718096;
+        }
+        .password-validation {
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+        .validation-item {
+            color: #e53e3e;
+            margin-bottom: 4px;
+            transition: color 0.3s;
+        }
+        .validation-item.valid {
+            color: #7deb34;
+        }
+        .relative {
+            position: relative;
+        }
+        .identifier-type {
+            margin-top: 10px;
+            display: flex;
+            gap: 20px;
+        }
+        .alert {
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+        .alert-error {
+            background-color: #FEE2E2;
+            color: #B91C1C;
+            border: 1px solid #F87171;
+        }
+        .btn-loading {
+            position: relative;
+            color: transparent;
+        }
+        .btn-loading::after {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            border: 3px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: button-loading-spinner 1s ease infinite;
+        }
+        @keyframes button-loading-spinner {
+            from {
+                transform: rotate(0turn);
+            }
+            to {
+                transform: rotate(1turn);
+            }
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+            }
+            .form-section {
+                width: 100%;
+                max-width: 500px;
+                margin-bottom: 20px;
+            }
+            .welcome-section {
+                display: none; /* Hide welcome section on small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="p-4">
+        <div class="logo bg-white inline-block p-2 rounded">
+            <h1 class="text-xl font-bold text-blue-700">TEM<span class="text-xs block">TEPA'S EQUIPMENT MONITORING</span></h1>
+        </div>
+    </header>
+
+    <div class="login-container">
+        <div class="form-section">
+            <h2 class="text-center text-green-400 text-2xl font-bold mb-3">Welcome Back!</h2>
+            <p class="text-center text-gray-600 mb-6">Enter your login credential to access your account</p>
+            
+            <!-- Backend error message alert -->
+            <div id="backendError" class="alert alert-error hidden"></div>
+            
+            <form id="loginForm">
+                <div>
+                    <div class="icon-label">
+                        <div class="circle-icon"><i class="fas fa-user"></i></div>
+                        <label for="identifier">Email or Phone</label>
+                    </div>
+                    <input type="text" id="identifier" name="identifier" class="input-field" placeholder="Enter your email or phone number">
+                    
+                    <div class="identifier-type">
+                        <label class="flex items-center">
+                            <input type="radio" name="identifierType" value="email" checked class="mr-2">
+                            <span>Email</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="identifierType" value="phone" class="mr-2">
+                            <span>Phone</span>
+                        </label>
+                    </div>
+                    <p id="identifierError" class="text-xs text-red-500 mt-2 hidden"></p>
+                </div>
+                
+                <div class="mt-4">
+                    <div class="icon-label">
+                        <div class="circle-icon"><i class="fas fa-lock"></i></div>
+                        <label for="password">Password</label>
+                    </div>
+                    <div class="relative">
+                        <input type="password" id="password" name="password" class="input-field" placeholder="Enter your password">
+                        <span class="password-toggle" id="passwordToggle">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                    
+                    <div class="password-validation">
+                        <p class="font-medium text-gray-600 mb-2">Password must contain:</p>
+                        <p id="length" class="validation-item">• At least 8 characters</p>
+                        <p id="uppercase" class="validation-item">• At least one uppercase letter</p>
+                        <p id="lowercase" class="validation-item">• At least one lowercase letter</p>
+                        <p id="number" class="validation-item">• At least one number</p>
+                        <p id="special" class="validation-item">• At least one special character</p>
+                    </div>
+                </div>
+                
+                <div class="mt-8">
+                    <button type="submit" class="btn-primary" id="loginBtn">
+                        <span class="inline-block mr-2">→</span> Login
+                    </button>
+                </div>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <a href="{% url 'forgetpassword' %}" class="text-green-400 font-semibold">
+                    <i class="fas fa-key text-green-400 mr-1"></i> Forgot Password
+                </a>
+            </div>
+            
+            <div class="mt-8 text-center text-sm text-gray-500">
+                &copy;2025 Tepa's Equipment Monitoring
+            </div>
+        </div>
+        
+        <div class="welcome-section">
+            <h1 class="text-4xl font-bold text-blue-700 mb-6">TEPA's Equipment Monitoring</h1>
+            <h2 class="text-2xl text-blue-600 mb-4">Professional Equipment Management Solution</h2>
+            <p class="text-lg text-gray-700 mb-8 text-center">Access your dashboard to monitor, track, and manage all your equipment resources in real-time. Make informed decisions with our comprehensive analytics and reporting tools.</p>
+            <div class="flex flex-wrap justify-center gap-4 mt-4">
+                <div class="bg-blue-100 p-4 rounded-lg text-center w-36">
+                    <i class="fas fa-chart-line text-blue-600 text-3xl mb-2"></i>
+                    <p class="text-blue-700 font-medium">Real-time Analytics</p>
+                </div>
+                <div class="bg-blue-100 p-4 rounded-lg text-center w-36">
+                    <i class="fas fa-cogs text-blue-600 text-3xl mb-2"></i>
+                    <p class="text-blue-700 font-medium">Equipment Status</p>
+                </div>
+                <div class="bg-blue-100 p-4 rounded-lg text-center w-36">
+                    <i class="fas fa-bell text-blue-600 text-3xl mb-2"></i>
+                    <p class="text-blue-700 font-medium">Alert System</p>
+                </div>
+                <div class="bg-blue-100 p-4 rounded-lg text-center w-36">
+                    <i class="fas fa-file-alt text-blue-600 text-3xl mb-2"></i>
+                    <p class="text-blue-700 font-medium">Reports</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const identifierInput = document.getElementById('identifier');
+            const passwordInput = document.getElementById('password');
+            const passwordToggle = document.getElementById('passwordToggle');
+            const identifierError = document.getElementById('identifierError');
+            const backendError = document.getElementById('backendError');
+            const loginForm = document.getElementById('loginForm');
+            const loginBtn = document.getElementById('loginBtn');
+            const emailRadio = document.querySelector('input[value="email"]');
+            const phoneRadio = document.querySelector('input[value="phone"]');
+            
+            // Password validation elements
+            const lengthCheck = document.getElementById('length');
+            const uppercaseCheck = document.getElementById('uppercase');
+            const lowercaseCheck = document.getElementById('lowercase');
+            const numberCheck = document.getElementById('number');
+            const specialCheck = document.getElementById('special');
+            
+            // Toggle password visibility
+            passwordToggle.addEventListener('click', function() {
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    passwordToggle.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                } else {
+                    passwordInput.type = 'password';
+                    passwordToggle.innerHTML = '<i class="fas fa-eye"></i>';
+                }
+            });
+            
+            // Update placeholder based on selected identifier type
+            function updatePlaceholder() {
+                if (emailRadio.checked) {
+                    identifierInput.placeholder = 'Enter your email address';
+                } else {
+                    identifierInput.placeholder = 'Enter your phone number (e.g., 0781234567)';
+                }
+                // Clear any previous errors when switching type
+                identifierError.classList.add('hidden');
+            }
+            
+            emailRadio.addEventListener('change', updatePlaceholder);
+            phoneRadio.addEventListener('change', updatePlaceholder);
+            
+            // Initialize placeholder
+            updatePlaceholder();
+            
+            // Validate identifier input
+            identifierInput.addEventListener('input', function() {
+                validateIdentifier();
+            });
+            
+            function validateIdentifier() {
+                const value = identifierInput.value.trim();
+                
+                if (emailRadio.checked) {
+                    // Email validation
+                    if (!value.endsWith('@gmail.com')) {
+                        identifierError.textContent = 'Email must end with @gmail.com';
+                        identifierError.classList.remove('hidden');
+                        return false;
+                    } else {
+                        identifierError.classList.add('hidden');
+                        return true;
+                    }
+                } else {
+                    // Phone validation
+                    const validPrefixes = ['072', '073', '078', '079'];
+                    let isValid = false;
+                    
+                    if (value.length === 10) {
+                        for (const prefix of validPrefixes) {
+                            if (value.startsWith(prefix)) {
+                                isValid = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (!isValid) {
+                        identifierError.textContent = 'Phone must be 10 digits starting with 072, 073, 078, or 079';
+                        identifierError.classList.remove('hidden');
+                        return false;
+                    } else {
+                        identifierError.classList.add('hidden');
+                        return true;
+                    }
+                }
+            }
+            
+            // Validate password as user types
+            passwordInput.addEventListener('input', function() {
+                const password = passwordInput.value;
+                
+                // Check length
+                if (password.length >= 8) {
+                    lengthCheck.classList.add('valid');
+                } else {
+                    lengthCheck.classList.remove('valid');
+                }
+                
+                // Check uppercase
+                if (/[A-Z]/.test(password)) {
+                    uppercaseCheck.classList.add('valid');
+                } else {
+                    uppercaseCheck.classList.remove('valid');
+                }
+                
+                // Check lowercase
+                if (/[a-z]/.test(password)) {
+                    lowercaseCheck.classList.add('valid');
+                } else {
+                    lowercaseCheck.classList.remove('valid');
+                }
+                
+                // Check number
+                if (/[0-9]/.test(password)) {
+                    numberCheck.classList.add('valid');
+                } else {
+                    numberCheck.classList.remove('valid');
+                }
+                
+                // Check special character
+                if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+                    specialCheck.classList.add('valid');
+                } else {
+                    specialCheck.classList.remove('valid');
+                }
+            });
+            
+            // Clear backend error when user starts typing
+            identifierInput.addEventListener('input', function() {
+                backendError.classList.add('hidden');
+            });
+            
+            passwordInput.addEventListener('input', function() {
+                backendError.classList.add('hidden');
+            });
+            
+            // Form submission
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const isIdentifierValid = validateIdentifier();
+                const isPasswordValid = 
+                    lengthCheck.classList.contains('valid') &&
+                    uppercaseCheck.classList.contains('valid') &&
+                    lowercaseCheck.classList.contains('valid') &&
+                    numberCheck.classList.contains('valid') &&
+                    specialCheck.classList.contains('valid');
+                
+                if (isIdentifierValid && isPasswordValid) {
+                    // Show loading state
+                    loginBtn.classList.add('btn-loading');
+                    loginBtn.disabled = true;
+                    
+                    // Create form data to send
+                    const formData = {
+                        identifier: identifierInput.value.trim(),
+                        password: passwordInput.value,
+                        identifierType: emailRadio.checked ? 'email' : 'phone'
+                    };
+                    
+                    // Send API request
+                    fetch('/login/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData)
+                    })
+                    .then(response => response.json().then(data => ({ status: response.status, data })))
+                    .then(result => {
+                        // Reset loading state
+                        loginBtn.classList.remove('btn-loading');
+                        loginBtn.disabled = false;
+                        
+                        if (result.status === 200) {
+                            // Success - store token and user data in localStorage
+                            localStorage.setItem('accessToken', result.data.token.access);
+                            localStorage.setItem('refreshToken', result.data.token.refresh);
+                            localStorage.setItem('userData', JSON.stringify({
+                                id: result.data.id,
+                                first_name: result.data.first_name,
+                                last_name: result.data.last_name,
+                                email: result.data.email,
+                                phone_number: result.data.phone_number,
+                                role: result.data.role,
+                                status: result.data.status,
+                                profile_picture: result.data.profile_picture
+                            }));
+                            
+                            // Redirect to admin dashboard
+                            // Fixed: Use a direct URL instead of Django's url template tag
+                            window.location.href = "/adminDashboard/";
+                        } else {
+                            // Show error message
+                            backendError.textContent = result.data.detail || 'An error occurred during login.';
+                            backendError.classList.remove('hidden');
+                            
+                            // Scroll to the top of the form to show the error
+                            backendError.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    })
+                    .catch(error => {
+                        // Reset loading state
+                        loginBtn.classList.remove('btn-loading');
+                        loginBtn.disabled = false;
+                        
+                        // Show generic error message
+                        backendError.textContent = 'Network error. Please try again later.';
+                        backendError.classList.remove('hidden');
+                        console.error('Login error:', error);
+                    });
+                } else {
+                    // Show appropriate front-end validation error messages
+                    if (!isIdentifierValid) {
+                        identifierError.classList.remove('hidden');
+                    }
+                    
+                    // Scroll to the top of the form to show errors
+                    loginForm.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

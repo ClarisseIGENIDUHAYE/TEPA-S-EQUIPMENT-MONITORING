@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TEPA'S Equipment Monitoring - Account Settings</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+      }
+
+      .header {
+        background-color: #0077cc;
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+      }
+
+      .logo-text {
+        color: white;
+        font-weight: bold;
+        line-height: 1.2;
+      }
+
+      .logo-main {
+        font-size: 1.5rem;
+      }
+
+      .logo-sub {
+        font-size: 0.6rem;
+        display: block;
+      }
+
+      .user-profile {
+        display: flex;
+        align-items: center;
+        background-color: white;
+        border-radius: 30px;
+        padding: 8px 20px;
+        color: #333;
+      }
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #eee;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 12px;
+        overflow: hidden;
+      }
+
+      .user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .user-info {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .user-name {
+        font-weight: bold;
+        color: #0077cc;
+      }
+
+      .user-role {
+        font-size: 0.8rem;
+        color: #666;
+      }
+
+      .main-container {
+        display: flex;
+        min-height: calc(100vh - 70px);
+      }
+
+      .sidebar {
+        width: 280px;
+        background-color: white;
+        padding: 20px 0;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+      }
+
+      .sidebar-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        color: #333;
+        border-left: 4px solid transparent;
+        transition: all 0.3s;
+        margin-bottom: 5px;
+      }
+
+      .sidebar-item:hover,
+      .sidebar-item.active {
+        background-color: rgba(125, 235, 52, 0.1);
+        border-left-color: #7deb34;
+        color: #7deb34;
+      }
+
+      .sidebar-item i {
+        margin-right: 15px;
+        width: 20px;
+        text-align: center;
+      }
+
+      .main-content {
+        flex-grow: 1;
+        padding: 20px;
+      }
+
+      .page-title {
+        color: #0077cc;
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        font-weight: bold;
+      }
+
+      .section-title {
+        color: #0077cc;
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin: 15px 0;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f0f0f0;
+      }
+
+      .profile-container {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-label {
+        display: block;
+        margin-bottom: 5px;
+        color: #555;
+        font-weight: 500;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+
+      .form-input:focus {
+        border-color: #0077cc;
+        outline: none;
+      }
+
+      .profile-picture-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .profile-picture {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background-color: #f0f0f0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        margin-bottom: 15px;
+        border: 3px solid #7deb34;
+      }
+
+      .profile-picture img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .picture-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .btn {
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .btn-primary {
+        background-color: #0077cc;
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background-color: #005fa3;
+      }
+
+      .btn-success {
+        background-color: #7deb34;
+        color: white;
+      }
+
+      .btn-success:hover {
+        background-color: #6bc62d;
+      }
+
+      .btn-danger {
+        background-color: #dc3545;
+        color: white;
+      }
+
+      .btn-danger:hover {
+        background-color: #bd2130;
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .webcam-container {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+
+      .webcam-box {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        width: 90%;
+        max-width: 600px;
+      }
+
+      .webcam-title {
+        color: #0077cc;
+        font-size: 18px;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+
+      .webcam-preview {
+        width: 100%;
+        height: 300px;
+        background-color: #f0f0f0;
+        margin-bottom: 15px;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .webcam-actions {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .separator {
+        display: flex;
+        align-items: center;
+        margin: 20px 0;
+      }
+
+      .separator-line {
+        flex-grow: 1;
+        height: 1px;
+        background-color: #ddd;
+      }
+
+      .separator-text {
+        margin: 0 15px;
+        color: #777;
+        font-weight: 500;
+      }
+
+      /* Tab styles */
+      .tabs {
+        display: flex;
+        border-bottom: 1px solid #e0e0e0;
+        margin-bottom: 20px;
+      }
+
+      .tab-item {
+        padding: 10px 20px;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        color: #666;
+        font-weight: 500;
+        transition: all 0.3s;
+      }
+
+      .tab-item.active {
+        border-bottom-color: #0077cc;
+        color: #0077cc;
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      /* Header section */
+      .account-settings-header {
+        background-color: #0077cc;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px 8px 0 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+
+      .header-title {
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      /* Circle indicators */
+      .circle-indicator {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background-color: #7deb34;
+        color: white;
+        font-weight: bold;
+        margin-right: 10px;
+        font-size: 14px;
+      }
+
+      /* Responsive styles */
+      @media (max-width: 768px) {
+        .main-container {
+          flex-direction: column;
+        }
+
+        .sidebar {
+          width: 100%;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .header {
+          flex-direction: column;
+          padding: 10px;
+        }
+
+        .user-profile {
+          margin-top: 10px;
+          width: 100%;
+          justify-content: center;
+        }
+
+        .form-row {
+          flex-direction: column;
+        }
+
+        .form-group.col {
+          width: 100%;
+          padding: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="logo">
+        <div class="bg-white p-2 rounded mr-2">
+          <div class="logo-text text-blue-700">
+            <span class="logo-main text-blue-700">TEM</span>
+            <span class="logo-sub text-blue-700"
+              >TEPA'S EQUIPMENT MONITORING</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="user-profile">
+        <div class="user-avatar" id="userAvatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="user-info">
+          <div class="user-name" id="userName">Loading...</div>
+          <div class="user-role" id="userRole">Loading...</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="main-container">
+      <aside class="sidebar">
+        <a href="{% url 'adminDashboard' %}" class="sidebar-item">
+          <i class="fas fa-chart-pie"></i>
+          Dashboard
+        </a>
+
+        <a href="{% url 'display_schools_page' %}" class="sidebar-item">
+          <i class="fas fa-school"></i>
+          My Schools
+        </a>
+        <a href="#" class="sidebar-item">
+          <i class="fas fa-desktop"></i>
+          Devices
+        </a>
+
+        <a href="#" class="sidebar-item">
+          <i class="fas fa-calendar-alt"></i>
+          Sessions Information
+        </a>
+        <a href="#" class="sidebar-item active">
+          <i class="fas fa-cog"></i>
+          Account Setting
+        </a>
+      </aside>
+
+      <main class="main-content">
+        <h1 class="page-title">Account Setting</h1>
+
+        <div class="tabs">
+          <div class="tab-item active" data-tab="profile">
+            <i class="fas fa-user-edit mr-2"></i> Change Profile
+          </div>
+          <div class="tab-item" data-tab="password">
+            <i class="fas fa-lock mr-2"></i> Change Password
+          </div>
+        </div>
+
+        <div id="profileTab" class="tab-content active">
+          <div class="profile-container">
+            <div class="account-settings-header">
+              <div class="header-title">Change Profile</div>
+            </div>
+
+            <form id="profileForm">
+              <div class="section-title">
+                <span class="circle-indicator">1</span> Personal Profile
+              </div>
+
+              <div class="profile-picture-container">
+                <div class="profile-picture" id="profilePicturePreview">
+                  <i class="fas fa-user fa-3x text-gray-400"></i>
+                </div>
+                <div class="picture-actions">
+                  <label for="profilePictureUpload" class="btn btn-primary">
+                    <i class="fas fa-upload"></i> Upload Picture
+                  </label>
+                  <input
+                    type="file"
+                    id="profilePictureUpload"
+                    style="display: none"
+                    accept="image/*"
+                  />
+                  <button type="button" id="captureBtn" class="btn btn-primary">
+                    <i class="fas fa-camera"></i> Capture
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap -mx-2">
+                <div class="w-full md:w-1/2 px-2 mb-4">
+                  <div class="form-group">
+                    <label class="form-label" for="firstName">First Name</label>
+                    <input
+                      type="text"
+                      id="firstName"
+                      class="form-input"
+                      placeholder="Enter your first name"
+                    />
+                  </div>
+                </div>
+                <div class="w-full md:w-1/2 px-2 mb-4">
+                  <div class="form-group">
+                    <label class="form-label" for="lastName">Last Name</label>
+                    <input
+                      type="text"
+                      id="lastName"
+                      class="form-input"
+                      placeholder="Enter your last name"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="phoneNumber">Phone Number</label>
+                <input
+                  type="text"
+                  id="phoneNumber"
+                  class="form-input"
+                  placeholder="Enter your phone number"
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <input
+                  type="email"
+                  id="email"
+                  class="form-input"
+                  placeholder="Enter your email address"
+                />
+              </div>
+
+              <div class="section-title">
+                <span class="circle-indicator">2</span> Account Credentials
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="role">Role</label>
+                <input type="text" id="role" class="form-input" disabled />
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn btn-danger">
+                  <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="submit" class="btn btn-success">
+                  <i class="fas fa-save"></i> Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div id="passwordTab" class="tab-content">
+          <div class="profile-container">
+            <div class="account-settings-header">
+              <div class="header-title">Change Password</div>
+            </div>
+
+            <form id="passwordForm">
+              <div class="form-group">
+                <label class="form-label" for="currentPassword"
+                  >Current Password</label
+                >
+                <input
+                  type="password"
+                  id="currentPassword"
+                  class="form-input"
+                  placeholder="Enter your current password"
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="newPassword">New Password</label>
+                <input
+                  type="password"
+                  id="newPassword"
+                  class="form-input"
+                  placeholder="Enter your new password"
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="confirmPassword"
+                  >Confirm Password</label
+                >
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  class="form-input"
+                  placeholder="Confirm your new password"
+                />
+              </div>
+
+              <div class="password-validation">
+                <p class="font-medium text-gray-600 mb-2">
+                  Password must contain:
+                </p>
+                <p id="length" class="validation-item">
+                  • At least 8 characters
+                </p>
+                <p id="uppercase" class="validation-item">
+                  • At least one uppercase letter
+                </p>
+                <p id="lowercase" class="validation-item">
+                  • At least one lowercase letter
+                </p>
+                <p id="number" class="validation-item">• At least one number</p>
+                <p id="special" class="validation-item">
+                  • At least one special character
+                </p>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn btn-danger">
+                  <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="submit" class="btn btn-success">
+                  <i class="fas fa-save"></i> Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Webcam Capture Modal -->
+    <div id="webcamModal" class="webcam-container">
+      <div class="webcam-box">
+        <div class="webcam-title">
+          <i class="fas fa-camera mr-2"></i> Capture Profile Picture
+        </div>
+        <div class="webcam-preview">
+          <video
+            id="webcamVideo"
+            width="100%"
+            height="100%"
+            autoplay
+            playsinline
+          ></video>
+          <canvas id="webcamCanvas" style="display: none"></canvas>
+        </div>
+        <div class="webcam-actions">
+          <button id="closeWebcamBtn" class="btn btn-danger">
+            <i class="fas fa-times"></i> Cancel
+          </button>
+          <button id="takePictureBtn" class="btn btn-primary">
+            <i class="fas fa-camera"></i> Take Picture
+          </button>
+          <button
+            id="acceptPictureBtn"
+            class="btn btn-success"
+            style="display: none"
+          >
+            <i class="fas fa-check"></i> Accept
+          </button>
+          <button
+            id="retakePictureBtn"
+            class="btn btn-primary"
+            style="display: none"
+          >
+            <i class="fas fa-redo"></i> Retake
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Get elements
+        const userAvatar = document.getElementById("userAvatar");
+        const userName = document.getElementById("userName");
+        const userRole = document.getElementById("userRole");
+
+        // Tab navigation
+        const tabItems = document.querySelectorAll(".tab-item");
+        const tabContents = document.querySelectorAll(".tab-content");
+
+        // Profile form elements
+        const profileForm = document.getElementById("profileForm");
+        const firstNameInput = document.getElementById("firstName");
+        const lastNameInput = document.getElementById("lastName");
+        const phoneNumberInput = document.getElementById("phoneNumber");
+        const emailInput = document.getElementById("email");
+        const roleInput = document.getElementById("role");
+        const profilePicturePreview = document.getElementById(
+          "profilePicturePreview"
+        );
+        const profilePictureUpload = document.getElementById(
+          "profilePictureUpload"
+        );
+
+        // Password form elements
+        const passwordForm = document.getElementById("passwordForm");
+        const newPasswordInput = document.getElementById("newPassword");
+        const confirmPasswordInput = document.getElementById("confirmPassword");
+        const lengthCheck = document.getElementById("length");
+        const uppercaseCheck = document.getElementById("uppercase");
+        const lowercaseCheck = document.getElementById("lowercase");
+        const numberCheck = document.getElementById("number");
+        const specialCheck = document.getElementById("special");
+
+        // Webcam elements
+        const captureBtn = document.getElementById("captureBtn");
+        const webcamModal = document.getElementById("webcamModal");
+        const closeWebcamBtn = document.getElementById("closeWebcamBtn");
+        const webcamVideo = document.getElementById("webcamVideo");
+        const webcamCanvas = document.getElementById("webcamCanvas");
+        const takePictureBtn = document.getElementById("takePictureBtn");
+        const acceptPictureBtn = document.getElementById("acceptPictureBtn");
+        const retakePictureBtn = document.getElementById("retakePictureBtn");
+
+        let stream = null;
+        let capturedImage = null;
+
+        // Get user data from localStorage
+        const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+
+        // Initialize user data and fill forms
+        function initializeUserData() {
+          // Set user name
+          if (userData.first_name && userData.last_name) {
+            userName.textContent =
+              userData.first_name + " " + userData.last_name;
+          } else {
+            userName.textContent = "Guest User";
+          }
+
+          // Set user role
+          if (userData.role) {
+            userRole.textContent = userData.role;
+          } else {
+            userRole.textContent = "User";
+          }
+
+          // Set user avatar
+          if (userData.profile_picture) {
+            userAvatar.innerHTML = `<img src="${userData.profile_picture}" alt="User Avatar">`;
+            profilePicturePreview.innerHTML = `<img src="${userData.profile_picture}" alt="Profile Picture">`;
+          } else {
+            userAvatar.innerHTML = `<i class="fas fa-user"></i>`;
+            profilePicturePreview.innerHTML = `<i class="fas fa-user fa-3x text-gray-400"></i>`;
+          }
+
+          // Fill form with user data
+          if (userData) {
+            firstNameInput.value = userData.first_name || "";
+            lastNameInput.value = userData.last_name || "";
+            phoneNumberInput.value = userData.phone_number || "";
+            emailInput.value = userData.email || "";
+            roleInput.value = userData.role || "";
+          }
+        }
+
+        // Initialize user data
+        initializeUserData();
+
+        // Tab switching
+        tabItems.forEach((tab) => {
+          tab.addEventListener("click", function () {
+            const tabId = this.getAttribute("data-tab");
+
+            // Remove active class from all tabs
+            tabItems.forEach((t) => t.classList.remove("active"));
+            tabContents.forEach((c) => c.classList.remove("active"));
+
+            // Add active class to selected tab
+            this.classList.add("active");
+            document.getElementById(tabId + "Tab").classList.add("active");
+          });
+        });
+
+        // Handle profile picture upload
+        profilePictureUpload.addEventListener("change", function (e) {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+              const img = new Image();
+              img.onload = function () {
+                profilePicturePreview.innerHTML = "";
+                profilePicturePreview.appendChild(img);
+                capturedImage = event.target.result;
+              };
+              img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+
+        // Handle webcam capture button
+        captureBtn.addEventListener("click", function () {
+          openWebcam();
+        });
+
+        // Close webcam modal
+        closeWebcamBtn.addEventListener("click", function () {
+          closeWebcam();
+        });
+
+        // Take picture
+        takePictureBtn.addEventListener("click", function () {
+          capturePicture();
+        });
+
+        // Accept captured picture
+        acceptPictureBtn.addEventListener("click", function () {
+          acceptPicture();
+        });
+
+        // Retake picture
+        retakePictureBtn.addEventListener("click", function () {
+          startWebcamPreview();
+        });
+
+        // Open webcam
+        function openWebcam() {
+          webcamModal.style.display = "flex";
+          startWebcamPreview();
+        }
+
+        // Start webcam preview
+        function startWebcamPreview() {
+          // Show/hide appropriate buttons
+          takePictureBtn.style.display = "block";
+          acceptPictureBtn.style.display = "none";
+          retakePictureBtn.style.display = "none";
+
+          // Start webcam
+          navigator.mediaDevices
+            .getUserMedia({ video: true })
+            .then(function (s) {
+              stream = s;
+              webcamVideo.srcObject = stream;
+            })
+            .catch(function (error) {
+              console.error("Webcam error:", error);
+              alert(
+                "Unable to access webcam. Please ensure you have a working camera and have granted permission."
+              );
+              closeWebcam();
+            });
+        }
+
+        // Capture picture from webcam
+        function capturePicture() {
+          // Setup canvas
+          const context = webcamCanvas.getContext("2d");
+          webcamCanvas.width = webcamVideo.videoWidth;
+          webcamCanvas.height = webcamVideo.videoHeight;
+
+          // Draw video frame to canvas
+          context.drawImage(
+            webcamVideo,
+            0,
+            0,
+            webcamCanvas.width,
+            webcamCanvas.height
+          );
+
+          // Get data URL
+          capturedImage = webcamCanvas.toDataURL("image/png");
+
+          // Stop video stream
+          if (stream) {
+            stream.getTracks().forEach((track) => {
+              track.stop();
+            });
+          }
+
+          // Show captured image
+          webcamVideo.style.display = "none";
+          webcamCanvas.style.display = "block";
+
+          // Show/hide appropriate buttons
+          takePictureBtn.style.display = "none";
+          acceptPictureBtn.style.display = "block";
+          retakePictureBtn.style.display = "block";
+        }
+
+        // Accept captured picture
+        function acceptPicture() {
+          // Update profile picture preview
+          profilePicturePreview.innerHTML = `<img src="${capturedImage}" alt="Profile Picture">`;
+
+          // Close webcam
+          closeWebcam();
+        }
+
+        // Close webcam
+        function closeWebcam() {
+          // Stop video stream
+          if (stream) {
+            stream.getTracks().forEach((track) => {
+              track.stop();
+            });
+          }
+
+          // Reset webcam UI
+          webcamVideo.style.display = "block";
+          webcamCanvas.style.display = "none";
+
+          // Hide modal
+          webcamModal.style.display = "none";
+        }
+
+        // Handle profile form submission
+        // Replace your profile form submission with this code
+        // Handle profile form submission
+        profileForm.addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          // Get form data
+          const formData = {
+            first_name: firstNameInput.value,
+            last_name: lastNameInput.value,
+            phone_number: phoneNumberInput.value,
+            email: emailInput.value,
+            role: userData.role,
+            profile_picture: capturedImage || userData.profile_picture,
+          };
+
+          
+      
+          // Ensure we have the token
+          const token = localStorage.getItem("accessToken");
+          console.log("User Token: ", token);
+          if (!token) {
+            alert("Authentication token missing. Please log in again.");
+            return;
+          }
+
+          // Send data to backend
+          fetch(`/update/`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": getCookie("csrftoken"), // Django CSRF token
+              Authorization: `Bearer ${token}`, // Ensure correct format
+            },
+            body: JSON.stringify(formData),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                if (response.status === 401) {
+                  throw new Error("Unauthorized. Please log in again.");
+                }
+                throw new Error("Profile update failed");
+              }
+              return response.json();
+            })
+            .then((data) => {
+              // Update localStorage
+              localStorage.setItem("userData", JSON.stringify(formData));
+
+              // Update header display
+              userName.textContent =
+                formData.first_name + " " + formData.last_name;
+              if (formData.profile_picture) {
+                userAvatar.innerHTML = `<img src="${formData.profile_picture}" alt="User Avatar">`;
+              }
+
+              alert("Profile updated successfully!");
+            })
+            .catch((error) => {
+              alert("Error updating profile: " + error.message);
+            });
+        });
+
+        // Helper function to get CSRF token
+        function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === name + "=") {
+                cookieValue = decodeURIComponent(
+                  cookie.substring(name.length + 1)
+                );
+                break;
+              }
+            }
+          }
+          return cookieValue;
+        }
+
+        // Validate password as user types
+        newPasswordInput.addEventListener("input", function () {
+          validatePassword();
+        });
+
+        // Validate password
+        function validatePassword() {
+          const password = newPasswordInput.value;
+
+          // Check length
+          lengthCheck.classList.toggle("valid", password.length >= 8);
+
+          // Check uppercase
+          uppercaseCheck.classList.toggle("valid", /[A-Z]/.test(password));
+
+          // Check lowercase
+          lowercaseCheck.classList.toggle("valid", /[a-z]/.test(password));
+
+          // Check number
+          numberCheck.classList.toggle("valid", /[0-9]/.test(password));
+
+          // Check special character
+          specialCheck.classList.toggle(
+            "valid",
+            /[!@#$%^&*(),.?":{}|<>]/.test(password)
+          );
+        }
+
+        // Handle password form submission
+        // Replace your password form submission with this code
+        passwordForm.addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          // Validate password
+          const newPassword = newPasswordInput.value;
+          const confirmPassword = confirmPasswordInput.value;
+          const currentPassword =
+            document.getElementById("currentPassword").value;
+
+          if (newPassword !== confirmPassword) {
+            alert("Passwords do not match!");
+            return;
+          }
+
+          const isPasswordValid =
+            lengthCheck.classList.contains("valid") &&
+            uppercaseCheck.classList.contains("valid") &&
+            lowercaseCheck.classList.contains("valid") &&
+            numberCheck.classList.contains("valid") &&
+            specialCheck.classList.contains("valid");
+
+          if (!isPasswordValid) {
+            alert("Password does not meet the requirements!");
+            return;
+          }
+
+          // Send to backend
+          fetch("/forget_password/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": getCookie("csrftoken"),
+            },
+            body: JSON.stringify({
+              email: userData.email, // Use the logged-in user's email
+              new_password: newPassword,
+            }),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Password update failed");
+              }
+              return response.json();
+            })
+            .then((data) => {
+              alert("Password updated successfully!");
+              passwordForm.reset();
+              validatePassword();
+            })
+            .catch((error) => {
+              alert("Error updating password: " + error.message);
+            });
+        });
+      });
+      // Handle Profile Form Submission (Save User Data)
+      profileForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const formData = {
+          first_name: firstNameInput.value,
+          last_name: lastNameInput.value,
+          phone_number: phoneNumberInput.value,
+          email: emailInput.value,
+          profile_picture: capturedImage || userData.profile_picture,
+        };
+
+        localStorage.setItem("userData", JSON.stringify(formData));
+
+        alert("Profile updated successfully!");
+      });
+
+      // Handle Password Validation in Real-time
+      newPasswordInput.addEventListener("input", function () {
+        validatePassword();
+      });
+
+      function validatePassword() {
+        const password = newPasswordInput.value;
+
+        lengthCheck.classList.toggle("valid", password.length >= 8);
+        uppercaseCheck.classList.toggle("valid", /[A-Z]/.test(password));
+        lowercaseCheck.classList.toggle("valid", /[a-z]/.test(password));
+        numberCheck.classList.toggle("valid", /[0-9]/.test(password));
+        specialCheck.classList.toggle(
+          "valid",
+          /[!@#$%^&*(),.?":{}|<>]/.test(password)
+        );
+      }
+
+      // Handle Password Form Submission
+      passwordForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        if (newPasswordInput.value !== confirmPasswordInput.value) {
+          alert("Passwords do not match!");
+          return;
+        }
+
+        if (
+          !lengthCheck.classList.contains("valid") ||
+          !uppercaseCheck.classList.contains("valid") ||
+          !lowercaseCheck.classList.contains("valid") ||
+          !numberCheck.classList.contains("valid") ||
+          !specialCheck.classList.contains("valid")
+        ) {
+          alert("Password does not meet the security requirements!");
+          return;
+        }
+
+        alert("Password updated successfully!");
+        passwordForm.reset();
+        validatePassword();
+      });
+
+      // Webcam Handling
+      captureBtn.addEventListener("click", function () {
+        openWebcam();
+      });
+
+      function openWebcam() {
+        webcamModal.style.display = "flex";
+        navigator.mediaDevices
+          .getUserMedia({ video: true })
+          .then((stream) => {
+            webcamVideo.srcObject = stream;
+          })
+          .catch((error) => {
+            console.error("Webcam access error:", error);
+            alert("Failed to access webcam. Please check camera permissions.");
+            closeWebcam();
+          });
+      }
+
+      function capturePicture() {
+        const context = webcamCanvas.getContext("2d");
+        webcamCanvas.width = webcamVideo.videoWidth;
+        webcamCanvas.height = webcamVideo.videoHeight;
+        context.drawImage(
+          webcamVideo,
+          0,
+          0,
+          webcamCanvas.width,
+          webcamCanvas.height
+        );
+
+        capturedImage = webcamCanvas.toDataURL("image/png");
+        profilePicturePreview.innerHTML = `<img src="${capturedImage}" alt="Profile Picture">`;
+        closeWebcam();
+      }
+
+      function closeWebcam() {
+        if (webcamVideo.srcObject) {
+          webcamVideo.srcObject.getTracks().forEach((track) => track.stop());
+        }
+        webcamModal.style.display = "none";
+      }
+    </script>
+    <!-- Proper closing for script -->
+  </body>
+</html>
