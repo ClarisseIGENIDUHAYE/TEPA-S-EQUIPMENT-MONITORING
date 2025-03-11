@@ -17,6 +17,7 @@
         background-color: #f7f9fc;
         font-family: Arial, sans-serif;
       }
+
       .header {
         background-color: #0077cc;
         color: white;
@@ -93,9 +94,9 @@
         background-color: white;
         padding: 20px 0;
         box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
-    }
-    
-    .sidebar-item {
+      }
+
+      .sidebar-item {
         display: flex;
         align-items: center;
         padding: 12px 20px;
@@ -103,32 +104,36 @@
         border-left: 4px solid transparent;
         transition: all 0.3s;
         margin-bottom: 5px;
-    }
-    
-    .sidebar-item:hover, .sidebar-item.active {
+      }
+
+      .sidebar-item:hover,
+      .sidebar-item.active {
         background-color: rgba(125, 235, 52, 0.1);
         border-left-color: #7deb34;
         color: #7deb34;
-    }
-    
-    .sidebar-item i {
+      }
+
+      .sidebar-item i {
         margin-right: 15px;
         width: 20px;
         text-align: center;
-    }
+      }
 
       .schools-container {
         max-width: 1200px;
         margin: 2rem auto;
         padding: 0 1rem;
       }
+
       .action-btn {
         cursor: pointer;
         transition: transform 0.2s;
       }
+
       .action-btn:hover {
         transform: scale(1.2);
       }
+
       .modal {
         display: none;
         position: fixed;
@@ -140,6 +145,7 @@
         overflow: auto;
         background-color: rgba(0, 0, 0, 0.5);
       }
+
       .modal-content {
         background-color: white;
         margin: 5% auto;
@@ -150,16 +156,19 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         animation: modalOpen 0.3s ease;
       }
+
       @keyframes modalOpen {
         from {
           opacity: 0;
           transform: translateY(-20px);
         }
+
         to {
           opacity: 1;
           transform: translateY(0);
         }
       }
+
       .close-modal {
         color: #aaa;
         float: right;
@@ -167,17 +176,21 @@
         font-weight: bold;
         cursor: pointer;
       }
+
       .close-modal:hover {
         color: #555;
       }
+
       .form-field {
         margin-bottom: 1rem;
       }
+
       .form-field label {
         display: block;
         margin-bottom: 0.5rem;
         font-weight: 500;
       }
+
       .form-field input,
       .form-field select {
         width: 100%;
@@ -186,6 +199,7 @@
         border-radius: 4px;
         font-size: 1rem;
       }
+
       .btn-primary {
         background-color: #0077cc;
         color: white;
@@ -196,9 +210,11 @@
         font-weight: 500;
         transition: background-color 0.3s;
       }
+
       .btn-primary:hover {
         background-color: #005fa3;
       }
+
       .btn-danger {
         background-color: #e53e3e;
         color: white;
@@ -209,9 +225,11 @@
         font-weight: 500;
         transition: background-color 0.3s;
       }
+
       .btn-danger:hover {
         background-color: #c53030;
       }
+
       .btn-secondary {
         background-color: #718096;
         color: white;
@@ -222,9 +240,11 @@
         font-weight: 500;
         transition: background-color 0.3s;
       }
+
       .btn-secondary:hover {
         background-color: #4a5568;
       }
+
       .pagination-btn {
         padding: 0.5rem 0.75rem;
         margin: 0 0.25rem;
@@ -233,33 +253,40 @@
         cursor: pointer;
         transition: background-color 0.3s;
       }
+
       .pagination-btn.active {
         background-color: #0077cc;
         color: white;
         border-color: #0077cc;
       }
+
       .pagination-btn:hover:not(.active) {
         background-color: #f0f0f0;
       }
+
       .alert {
         padding: 1rem;
         margin-bottom: 1rem;
         border-radius: 4px;
       }
+
       .alert-success {
         background-color: #c6f6d5;
         color: #2f855a;
         border: 1px solid #9ae6b4;
       }
+
       .alert-error {
         background-color: #fed7d7;
         color: #c53030;
         border: 1px solid #feb2b2;
       }
+
       .btn-loading {
         position: relative;
         color: transparent;
       }
+
       .btn-loading::after {
         content: "";
         position: absolute;
@@ -275,16 +302,31 @@
         border-radius: 50%;
         animation: button-loading-spinner 1s ease infinite;
       }
+
       @keyframes button-loading-spinner {
         from {
           transform: rotate(0turn);
         }
+
         to {
           transform: rotate(1turn);
         }
       }
+
+      /* Add this to your existing <style> section */
+      .main-container {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      .content-area {
+        flex: 1;
+        padding: 20px;
+        overflow-x: auto;
+      }
     </style>
   </head>
+
   <body>
     <header class="header">
       <div class="logo">
@@ -309,41 +351,45 @@
       </div>
     </header>
 
-    <div class=".main-container">
+    <!-- Replace the current .main-container div with this -->
+    <div class="main-container">
+      <aside class="sidebar">
+        <a href="{% url 'adminDashboard' %}" class="sidebar-item active">
+          <i class="fas fa-chart-pie"></i>
+          Dashboard
+        </a>
 
-        <aside class="sidebar">
-            <a href="#" class="sidebar-item active">
-                <i class="fas fa-chart-pie"></i>
-                Dashboard
-            </a>
-            
-            <a href="{% url 'display_schools_page' %}" class="sidebar-item">
-                <i class="fas fa-school"></i>
-                My Schools
-            </a>
-            <a href="#" class="sidebar-item">
-                <i class="fas fa-desktop"></i>
-                Devices
-            </a>
-            
-            <a href="#" class="sidebar-item">
-                <i class="fas fa-calendar-alt"></i>
-                Sessions Information
-            </a>
-            <a href="{% url 'get_updateForm' %}" class="sidebar-item">
-                <i class="fas fa-cog"></i>
-                Account Setting
-            </a>
-        </aside>
-        
-    
+        <a
+          href="{% url 'display_schools_page' %}"
+          class="sidebar-item"
+        >
+          <i class="fas fa-school"></i>
+          My Schools
+        </a>
+        <a href="#" class="sidebar-item">
+          <i class="fas fa-desktop"></i>
+          Devices
+        </a>
+
+        <a href="#" class="sidebar-item">
+          <i class="fas fa-calendar-alt"></i>
+          Sessions Information
+        </a>
+        <a href="{% url 'get_updateForm' %}" class="sidebar-item">
+          <i class="fas fa-cog"></i>
+          Account Setting
+        </a>
+      </aside>
+
+      <div class="content-area">
         <div class="schools-container">
-            
-          <h1 class="text-3xl font-bold text-gray-800 mb-6">Schools Management</h1>
-    
+          <h1 class="text-3xl font-bold text-gray-800 mb-6">
+            Schools Management
+          </h1>
+
           <!-- Alert message container (hidden by default) -->
           <div id="alertMessage" class="alert hidden"></div>
-    
+
           <!-- Filters and Add School Button -->
           <div class="flex flex-wrap justify-between items-center mb-6">
             <div class="flex flex-wrap items-center space-x-4 mb-4 sm:mb-0">
@@ -372,7 +418,7 @@
               <i class="fas fa-plus mr-2"></i> Add New School
             </button>
           </div>
-    
+
           <!-- Schools Table -->
           <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
             <table class="min-w-full divide-y divide-gray-200">
@@ -428,7 +474,7 @@
               </tbody>
             </table>
           </div>
-    
+
           <!-- Pagination Controls -->
           <div class="flex flex-wrap justify-between items-center">
             <div class="flex items-center mb-4 sm:mb-0">
@@ -459,10 +505,8 @@
             </div>
           </div>
         </div>
-        
+      </div>
     </div>
-
-    
 
     <!-- Add/Edit School Modal -->
     <div id="schoolModal" class="modal">
@@ -575,617 +619,667 @@
     </div>
 
     <script>
-              document.addEventListener('DOMContentLoaded', function() {
-
-                // Get elements
-            const userAvatar = document.getElementById('userAvatar');
-            const userName = document.getElementById('userName');
-            const userRole = document.getElementById('userRole');
-            
-            // Get user data from localStorage
-            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-            console.log("UserData: ", userData);
-            
-            // Set user name
-            if (userData.first_name && userData.last_name) {
-                userName.textContent = userData.first_name + ' ' + userData.last_name;
-            } else {
-                userName.textContent = 'Guest User';
-            }
-            
-            // Set user role
-            if (userData.role) {
-                userRole.textContent = userData.role;
-            } else {
-                userRole.textContent = 'User';
-            }
-            
-            // Set user avatar
-            if (userData.profile_picture) {
-                userAvatar.innerHTML = `<img src="${userData.profile_picture}" alt="User Avatar">`;
-            } else {
-                userAvatar.innerHTML = `<i class="fas fa-user"></i>`;
-            }
-                  // Rwanda provinces and districts data
-                  const rwandaData = {
-                      "Kigali City": ["Nyarugenge", "Gasabo", "Kicukiro"],
-                      "Northern Province": ["Burera", "Gakenke", "Gicumbi", "Musanze", "Rulindo"],
-                      "Southern Province": ["Gisagara", "Huye", "Kamonyi", "Muhanga", "Nyamagabe", "Nyanza", "Nyaruguru", "Ruhango"],
-                      "Eastern Province": ["Bugesera", "Gatsibo", "Kayonza", "Kirehe", "Ngoma", "Nyagatare", "Rwamagana"],
-                      "Western Province": ["Karongi", "Ngororero", "Nyabihu", "Nyamasheke", "Rubavu", "Rusizi", "Rutsiro"]
-                  };
-
-                  // Initialize variables
-                  let allSchools = [];
-                  let filteredSchools = [];
-                  let currentPage = 1;
-                  let itemsPerPage = 10;
-                  let currentSchoolId = null;
-
-                  // DOM Elements
-                  const provinceFilter = document.getElementById('provinceFilter');
-                  const districtFilter = document.getElementById('districtFilter');
-                  const itemsPerPageSelect = document.getElementById('itemsPerPage');
-                  const schoolsTableBody = document.getElementById('schoolsTableBody');
-                  const paginationInfo = document.getElementById('paginationInfo');
-                  const paginationNumbers = document.getElementById('paginationNumbers');
-                  const alertMessage = document.getElementById('alertMessage');
-                  const userNameDisplay = document.getElementById('userName');
-
-                  // Modal Elements
-                  const schoolModal = document.getElementById('schoolModal');
-                  const viewSchoolModal = document.getElementById('viewSchoolModal');
-                  const deleteModal = document.getElementById('deleteModal');
-                  const schoolForm = document.getElementById('schoolForm');
-                  const schoolModalTitle = document.getElementById('schoolModalTitle');
-                  const saveSchoolBtn = document.getElementById('saveSchoolBtn');
-
-                  // Initialize province filter dropdown
-                  function initializeProvinceFilter() {
-                      provinceFilter.innerHTML = '<option value="">All Provinces</option>';
-                      Object.keys(rwandaData).forEach(province => {
-                          provinceFilter.innerHTML += `<option value="${province}">${province}</option>`;
-                      });
-                  }
-
-                  // Update district filter based on selected province
-                  function updateDistrictFilter(province) {
-                      districtFilter.innerHTML = '<option value="">All Districts</option>';
-
-                      if (province && rwandaData[province]) {
-                          rwandaData[province].forEach(district => {
-                              districtFilter.innerHTML += `<option value="${district}">${district}</option>`;
-                          });
-                      }
-                  }
-
-                  // Initialize form province dropdown
-                  function initializeProvinceForm() {
-                      const provinceSelect = document.getElementById('province');
-                      provinceSelect.innerHTML = '<option value="">Select Province</option>';
-
-                      Object.keys(rwandaData).forEach(province => {
-                          provinceSelect.innerHTML += `<option value="${province}">${province}</option>`;
-                      });
-                  }
-
-                  // Update form district dropdown based on selected province
-                  function updateDistrictForm(province) {
-                      const districtSelect = document.getElementById('district');
-                      districtSelect.innerHTML = '<option value="">Select District</option>';
-
-                      if (province && rwandaData[province]) {
-                          rwandaData[province].forEach(district => {
-                              districtSelect.innerHTML += `<option value="${district}">${district}</option>`;
-                          });
-                      }
-                  }
-
-                  // Get access token from local storage
-                  function getAccessToken() {
-                      return localStorage.getItem('accessToken');
-                  }
-
-                  // Fetch all schools
-                  async function fetchSchools() {
-                      try {
-                          const token = getAccessToken();
-                          if (!token) {
-                              window.location.href = '/login'; // Redirect to login if no token
-                              return;
-                          }
-
-                          const response = await fetch('/school/schools/', {
-                              method: 'GET',
-                              headers: {
-                                  'Authorization': `Bearer ${token}`,
-                                  'Content-Type': 'application/json'
-                              }
-                          });
-
-                          if (!response.ok) {
-                              throw new Error('Failed to fetch schools');
-                          }
-
-                          const data = await response.json();
-                          allSchools = data;
-
-                          // Apply filters
-                          applyFilters();
-
-                      } catch (error) {
-                          console.error('Error fetching schools:', error);
-                          showAlert('Failed to load schools data. Please try again later.', 'error');
-                      }
-                  }
-
-                  // Apply filters to schools data
-                  function applyFilters() {
-                      const province = provinceFilter.value;
-                      const district = districtFilter.value;
-
-                      filteredSchools = allSchools.filter(school => {
-                          if (province && school.province !== province) {
-                              return false;
-                          }
-                          if (district && school.district !== district) {
-                              return false;
-                          }
-                          return true;
-                      });
-
-                      // Reset pagination when filters change
-                      currentPage = 1;
-
-                      // Update the UI
-                      renderSchoolsTable();
-                      renderPagination();
-                  }
-
-                  // Render schools table
-                  function renderSchoolsTable() {
-                      const startIndex = (currentPage - 1) * itemsPerPage;
-                      const endIndex = startIndex + itemsPerPage;
-                      const paginatedSchools = filteredSchools.slice(startIndex, endIndex);
-
-                      if (paginatedSchools.length === 0) {
-                          schoolsTableBody.innerHTML = `
-                              <tr>
-                                  <td colspan="6" class="px-6 py-4 text-center text-gray-500">No schools found.</td>
-                              </tr>
-                          `;
-                          return;
-                      }
-
-                      schoolsTableBody.innerHTML = '';
-
-                      paginatedSchools.forEach(school => {
-                          const createdAt = new Date(school.created_at).toLocaleDateString();
-
-                          schoolsTableBody.innerHTML += `
-                              <tr>
-                                  <td class="px-6 py-4 whitespace-nowrap">${school.index_number}</td>
-                                  <td class="px-6 py-4 whitespace-nowrap">${school.name}</td>
-                                  <td class="px-6 py-4 whitespace-nowrap">${school.province}</td>
-                                  <td class="px-6 py-4 whitespace-nowrap">${school.district}</td>
-                                  <td class="px-6 py-4 whitespace-nowrap">${createdAt}</td>
-                                  <td class="px-6 py-4 whitespace-nowrap text-right">
-                                      <span class="action-btn text-blue-600 mr-3" title="View Details" onclick="viewSchool(${school.id})">
-                                          <i class="fas fa-eye"></i>
-                                      </span>
-                                      <span class="action-btn text-green-600 mr-3" title="Edit School" onclick="editSchool(${school.id})">
-                                          <i class="fas fa-edit"></i>
-                                      </span>
-                                      <span class="action-btn text-red-600" title="Delete School" onclick="deleteSchool(${school.id}, '${school.name}')">
-                                          <i class="fas fa-trash"></i>
-                                      </span>
-                                  </td>
-                              </tr>
-                          `;
-                      });
-
-                      // Update pagination info
-                      const totalItems = filteredSchools.length;
-                      const showingStart = totalItems === 0 ? 0 : startIndex + 1;
-                      const showingEnd = Math.min(endIndex, totalItems);
-                      paginationInfo.textContent = `Showing ${showingStart}-${showingEnd} of ${totalItems}`;
-                  }
-
-                  // Render pagination controls
-                  function renderPagination() {
-                      const totalPages = Math.ceil(filteredSchools.length / itemsPerPage);
-                      paginationNumbers.innerHTML = '';
-
-                      // Previous button
-                      const prevButton = document.querySelector('[data-page="prev"]');
-                      prevButton.disabled = currentPage === 1;
-                      prevButton.classList.toggle('opacity-50', currentPage === 1);
-
-                      // Next button
-                      const nextButton = document.querySelector('[data-page="next"]');
-                      nextButton.disabled = currentPage === totalPages || totalPages === 0;
-                      nextButton.classList.toggle('opacity-50', currentPage === totalPages || totalPages === 0);
-
-                      // Page numbers
-                      let startPage = Math.max(1, currentPage - 2);
-                      let endPage = Math.min(totalPages, startPage + 4);
-
-                      if (endPage - startPage < 4) {
-                          startPage = Math.max(1, endPage - 4);
-                      }
-
-                      for (let i = startPage; i <= endPage; i++) {
-                          const pageButton = document.createElement('button');
-                          pageButton.className = `pagination-btn ${i === currentPage ? 'active' : ''}`;
-                          pageButton.textContent = i;
-                          pageButton.dataset.page = i;
-                          paginationNumbers.appendChild(pageButton);
-                      }
-                  }
-
-                  // Show alert message
-                  function showAlert(message, type) {
-                      alertMessage.textContent = message;
-                      alertMessage.classList.remove('hidden', 'alert-success', 'alert-error');
-
-                      if (type === 'success') {
-                          alertMessage.classList.add('alert-success');
-                      } else if (type === 'error') {
-                          alertMessage.classList.add('alert-error');
-                      }
-
-                      // Auto-hide after 5 seconds
-                      setTimeout(() => {
-                          alertMessage.classList.add('hidden');
-                      }, 5000);
-                  }
-
-                  // Reset school form
-                  function resetSchoolForm() {
-                      schoolForm.reset();
-                      document.getElementById('schoolId').value = '';
-                      schoolModalTitle.textContent = 'Add New School';
-                      updateDistrictForm('');
-                  }
-
-                  // Open modal
-                  function openModal(modal) {
-                      modal.style.display = 'block';
-                      document.body.style.overflow = 'hidden'; // Prevent scrolling
-                  }
-
-                  // Close modal
-                  function closeModal(modal) {
-                      modal.style.display = 'none';
-                      document.body.style.overflow = 'auto'; // Enable scrolling
-                  }
-
-                  // Handle pagination click
-                  document.getElementById('paginationControls').addEventListener('click', function(e) {
-                      const pageButton = e.target.closest('[data-page]');
-                      if (!pageButton) return;
-
-                      const totalPages = Math.ceil(filteredSchools.length / itemsPerPage);
-
-                      if (pageButton.dataset.page === 'prev') {
-                          if (currentPage > 1) {
-                              currentPage--;
-                          }
-                      } else if (pageButton.dataset.page === 'next') {
-                          if (currentPage < totalPages) {
-                              currentPage++;
-                          }
-                      } else {
-                          currentPage = parseInt(pageButton.dataset.page);
-                      }
-
-                      renderSchoolsTable();
-                      renderPagination();
-                  });
-
-                  // Handle items per page change
-                  itemsPerPageSelect.addEventListener('change', function() {
-                      itemsPerPage = parseInt(this.value);
-                      currentPage = 1; // Reset to first page
-                      renderSchoolsTable();
-                      renderPagination();
-                  });
-
-                  // Handle province filter change
-                  provinceFilter.addEventListener('change', function() {
-                      updateDistrictFilter(this.value);
-                      applyFilters();
-                  });
-
-                  // Handle district filter change
-                  districtFilter.addEventListener('change', function() {
-                      applyFilters();
-                  });
-
-                  // Handle form province change
-                  document.getElementById('province').addEventListener('change', function() {
-                      updateDistrictForm(this.value);
-                  });
-
-                  // Handle add school button click
-                  document.getElementById('addSchoolBtn').addEventListener('click', function() {
-                      resetSchoolForm();
-                      openModal(schoolModal);
-                  });
-
-                  // Handle cancel school form
-                  document.getElementById('cancelSchoolForm').addEventListener('click', function() {
-                      closeModal(schoolModal);
-                  });
-
-                  // Handle close school modal
-                  document.getElementById('closeSchoolModal').addEventListener('click', function() {
-                      closeModal(schoolModal);
-                  });
-
-                  // Handle close view modal
-                  document.getElementById('closeViewModal').addEventListener('click', function() {
-                      closeModal(viewSchoolModal);
-                  });
-
-                  // Handle close view button
-                  document.getElementById('closeViewBtn').addEventListener('click', function() {
-                      closeModal(viewSchoolModal);
-                  });
-
-                  // Handle close delete modal
-                  document.getElementById('closeDeleteModal').addEventListener('click', function() {
-                      closeModal(deleteModal);
-                  });
-
-                  // Handle cancel delete
-                  document.getElementById('cancelDelete').addEventListener('click', function() {
-                      closeModal(deleteModal);
-                  });
-
-                  // Handle school form submit
-                  schoolForm.addEventListener('submit', async function(e) {
-                      e.preventDefault();
-
-                      const schoolId = document.getElementById('schoolId').value;
-                      const indexNumber = document.getElementById('indexNumber').value;
-                      const name = document.getElementById('schoolName').value;
-                      const province = document.getElementById('province').value;
-                      const district = document.getElementById('district').value;
-
-                      // Validate form
-                      if (!indexNumber || !name || !province || !district) {
-                          showAlert('All fields are required.', 'error');
-                          return;
-                      }
-
-                      // Show loading state
-                      saveSchoolBtn.disabled = true;
-                      saveSchoolBtn.classList.add('btn-loading');
-
-                      try {
-                          const token = getAccessToken();
-
-                          const schoolData = {
-                              index_number: indexNumber,
-                              name: name,
-                              province: province,
-                              district: district
-                          };
-
-                          let url, method;
-
-                          if (schoolId) {
-                              // Update existing school
-                              url = `/school/update/${schoolId}/`;
-                              method = 'PUT';
-                          } else {
-                              // Create new school
-                              url = '/school/create/';
-                              method = 'POST';
-                          }
-
-                          const response = await fetch(url, {
-                              method: method,
-                              headers: {
-                                  'Authorization': `Bearer ${token}`,
-                                  'Content-Type': 'application/json'
-                              },
-                              body: JSON.stringify(schoolData)
-                          });
-
-                          const data = await response.json();
-
-                          if (!response.ok) {
-                              throw new Error(data.error || 'Failed to save school');
-                          }
-
-                          // Success
-                          closeModal(schoolModal);
-                          fetchSchools(); // Refresh the table
-                          showAlert(`School ${schoolId ? 'updated' : 'created'} successfully!`, 'success');
-
-                      } catch (error) {
-                          showAlert(error.message, 'error');
-                      } finally {
-                          // Reset loading state
-                          saveSchoolBtn.disabled = false;
-                          saveSchoolBtn.classList.remove('btn-loading');
-                      }
-                  });
-
-                  // Handle confirm delete
-                  document.getElementById('confirmDelete').addEventListener('click', async function() {
-                      if (!currentSchoolId) return;
-
-                      try {
-                          const token = getAccessToken();
-
-                          const response = await fetch(`/school/delete/${currentSchoolId}/`, {
-                              method: 'DELETE',
-                              headers: {
-                                  'Authorization': `Bearer ${token}`,
-                                  'Content-Type': 'application/json'
-                              }
-                          });
-
-                          if (!response.ok) {
-                              const data = await response.json();
-                              throw new Error(data.error || 'Failed to delete school');
-                          }
-
-                          // Success
-                          closeModal(deleteModal);
-                          fetchSchools(); // Refresh the table
-                          showAlert('School deleted successfully!', 'success');
-
-                      } catch (error) {
-                          showAlert(error.message, 'error');
-                      }
-                  });
-
-                  // Handle logout
-                  document.getElementById('logoutBtn').addEventListener('click', function() {
-                      localStorage.removeItem('accessToken');
-                      window.location.href = '/login';
-                  });
-
-                  //// Global variable for current school ID (needed for deleteSchool function)
-      let currentSchoolId = null;
-
-      // View school details function
-      function viewSchool(id) {
-          const school = allSchools.find(s => s.id === id);
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("DOM fully loaded and parsed.");
+
+        const userAvatar = document.getElementById("userAvatar");
+        const userName = document.getElementById("userName");
+        const userRole = document.getElementById("userRole");
+
+        const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+        console.log("User Data Loaded:", userData);
+
+        if (userData.first_name && userData.last_name) {
+          userName.textContent = `${userData.first_name} ${userData.last_name}`;
+        } else {
+          userName.textContent = "Guest User";
+        }
+
+        userRole.textContent = userData.role || "User";
+
+        if (userData.profile_picture) {
+          userAvatar.innerHTML = `<img src="${userData.profile_picture}" alt="User Avatar">`;
+        } else {
+          userAvatar.innerHTML = `<i class="fas fa-user"></i>`;
+        }
+
+        // Rwanda provinces and districts data
+        const rwandaData = {
+          "Kigali City": ["Nyarugenge", "Gasabo", "Kicukiro"],
+          NORTH: ["Burera", "Gakenke", "Gicumbi", "Musanze", "Rulindo"],
+          SOUTH: [
+            "Gisagara",
+            "Huye",
+            "Kamonyi",
+            "Muhanga",
+            "Nyamagabe",
+            "Nyanza",
+            "Nyaruguru",
+            "Ruhango",
+          ],
+          EAST: [
+            "Bugesera",
+            "Gatsibo",
+            "Kayonza",
+            "Kirehe",
+            "Ngoma",
+            "Nyagatare",
+            "Rwamagana",
+          ],
+          WEST: [
+            "Karongi",
+            "Ngororero",
+            "Nyabihu",
+            "Nyamasheke",
+            "Rubavu",
+            "Rusizi",
+            "Rutsiro",
+          ],
+        };
+
+        // Initialize variables
+        let allSchools = [];
+        let filteredSchools = [];
+        let currentPage = 1;
+        let itemsPerPage = 10;
+        let currentSchoolId = null;
+
+        // DOM Elements
+        const provinceFilter = document.getElementById("provinceFilter");
+        const districtFilter = document.getElementById("districtFilter");
+        const itemsPerPageSelect = document.getElementById("itemsPerPage");
+        const schoolsTableBody = document.getElementById("schoolsTableBody");
+        const paginationInfo = document.getElementById("paginationInfo");
+        const paginationNumbers = document.getElementById("paginationNumbers");
+        const alertMessage = document.getElementById("alertMessage");
+
+        /*** Fix for Add School Modal ***/
+        const schoolModal = document.getElementById("schoolModal");
+        const addSchoolBtn = document.getElementById("addSchoolBtn");
+        const closeSchoolModal = document.getElementById("closeSchoolModal");
+        const cancelSchoolForm = document.getElementById("cancelSchoolForm");
+
+        function openModal(modal) {
+          if (!modal) return;
+          modal.style.display = "block";
+          document.body.style.overflow = "hidden";
+        }
+
+        function closeModal(modal) {
+          if (!modal) return;
+          modal.style.display = "none";
+          document.body.style.overflow = "auto";
+        }
+
+        function resetSchoolForm() {
+          document.getElementById("schoolForm").reset();
+          document.getElementById("schoolId").value = "";
+        }
+
+        addSchoolBtn.addEventListener("click", function () {
+          console.log("Add School button clicked"); // Debugging log
+          resetSchoolForm();
+          openModal(schoolModal);
+        });
+
+        closeSchoolModal.addEventListener("click", function () {
+          closeModal(schoolModal);
+        });
+
+        cancelSchoolForm.addEventListener("click", function () {
+          closeModal(schoolModal);
+        });
+
+        // Initialize province filter dropdown
+
+        function initializeProvinceFilter() {
+          provinceFilter.innerHTML = '<option value="">All Provinces</option>';
+          Object.keys(rwandaData).forEach((province) => {
+            provinceFilter.innerHTML += `<option value="${province}">${province}</option>`;
+          });
+        }
+
+        // Update district filter based on selected province
+        function updateDistrictFilter(province) {
+          districtFilter.innerHTML = '<option value="">All Districts</option>';
+
+          if (province && rwandaData[province]) {
+            rwandaData[province].forEach((district) => {
+              districtFilter.innerHTML += `<option value="${district}">${district}</option>`;
+            });
+          }
+        }
+
+        // Initialize form province dropdown
+        function initializeProvinceForm() {
+          const provinceSelect = document.getElementById("province");
+          provinceSelect.innerHTML =
+            '<option value="">Select Province</option>';
+
+          Object.keys(rwandaData).forEach((province) => {
+            provinceSelect.innerHTML += `<option value="${province}">${province}</option>`;
+          });
+        }
+
+        // Update form district dropdown based on selected province
+        function updateDistrictForm(province) {
+          const districtSelect = document.getElementById("district");
+          districtSelect.innerHTML =
+            '<option value="">Select District</option>';
+
+          if (province && rwandaData[province]) {
+            rwandaData[province].forEach((district) => {
+              districtSelect.innerHTML += `<option value="${district}">${district}</option>`;
+            });
+          }
+        }
+
+        // Get access token from local storage
+        function getAccessToken() {
+          return localStorage.getItem("accessToken");
+        }
+
+        /*** Fix for School Data Fetching ***/
+
+        // Modify the fetchSchools function to include the authorization header
+        async function fetchSchools() {
+          try {
+            console.log("Fetching schools data...");
+            const token = getAccessToken();
+
+            const response = await fetch("/school/schools/", {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            });
+
+            if (!response.ok) throw new Error("Failed to fetch schools");
+            allSchools = await response.json();
+            applyFilters();
+          } catch (error) {
+            console.error("Error fetching schools:", error);
+            showAlert("Failed to load schools. Please try again.", "error");
+          }
+        }
+
+        function applyFilters() {
+          const province = provinceFilter.value;
+          const district = districtFilter.value;
+
+          filteredSchools = allSchools.filter((school) => {
+            return (
+              (!province || school.province === province) &&
+              (!district || school.district === district)
+            );
+          });
+
+          currentPage = 1; // Reset pagination
+          renderSchoolsTable();
+        }
+
+        function renderSchoolsTable() {
+          const startIndex = (currentPage - 1) * itemsPerPage;
+          const endIndex = startIndex + itemsPerPage;
+          const paginatedSchools = filteredSchools.slice(startIndex, endIndex);
+
+          schoolsTableBody.innerHTML = paginatedSchools.length
+            ? paginatedSchools
+                .map(
+                  (school) => `
+            <tr>
+                <td>${school.index_number}</td>
+                <td>${school.name}</td>
+                <td>${school.province}</td>
+                <td>${school.district}</td>
+                <td>${new Date(school.created_at).toLocaleDateString()}</td>
+                <td class="text-right">
+                    <span class="action-btn text-blue-600" onclick="viewSchool(${
+                      school.id
+                    })"><i class="fas fa-eye"></i></span>
+                    <span class="action-btn text-green-600" onclick="editSchool(${
+                      school.id
+                    })"><i class="fas fa-edit"></i></span>
+                    <span class="action-btn text-red-600" onclick="deleteSchool(${
+                      school.id
+                    })"><i class="fas fa-trash"></i></span>
+                </td>
+            </tr>
+        `
+                )
+                .join("")
+            : `<tr><td colspan="6" class="text-center text-gray-500">No schools found.</td></tr>`;
+        }
+
+        provinceFilter.addEventListener("change", applyFilters);
+        districtFilter.addEventListener("change", applyFilters);
+
+        fetchSchools(); // Initial fetch when page loads
+
+        // Render pagination controls
+        function renderPagination() {
+          const totalPages = Math.ceil(filteredSchools.length / itemsPerPage);
+          paginationNumbers.innerHTML = "";
+
+          // Previous button
+          const prevButton = document.querySelector('[data-page="prev"]');
+          prevButton.disabled = currentPage === 1;
+          prevButton.classList.toggle("opacity-50", currentPage === 1);
+
+          // Next button
+          const nextButton = document.querySelector('[data-page="next"]');
+          nextButton.disabled = currentPage === totalPages || totalPages === 0;
+          nextButton.classList.toggle(
+            "opacity-50",
+            currentPage === totalPages || totalPages === 0
+          );
+
+          // Page numbers
+          let startPage = Math.max(1, currentPage - 2);
+          let endPage = Math.min(totalPages, startPage + 4);
+
+          if (endPage - startPage < 4) {
+            startPage = Math.max(1, endPage - 4);
+          }
+
+          for (let i = startPage; i <= endPage; i++) {
+            const pageButton = document.createElement("button");
+            pageButton.className = `pagination-btn ${
+              i === currentPage ? "active" : ""
+            }`;
+            pageButton.textContent = i;
+            pageButton.dataset.page = i;
+            paginationNumbers.appendChild(pageButton);
+          }
+        }
+
+        // Show alert message
+        function showAlert(message, type) {
+          alertMessage.textContent = message;
+          alertMessage.classList.remove(
+            "hidden",
+            "alert-success",
+            "alert-error"
+          );
+
+          if (type === "success") {
+            alertMessage.classList.add("alert-success");
+          } else if (type === "error") {
+            alertMessage.classList.add("alert-error");
+          }
+
+          // Auto-hide after 5 seconds
+          setTimeout(() => {
+            alertMessage.classList.add("hidden");
+          }, 5000);
+        }
+
+        // Reset school form
+        function resetSchoolForm() {
+          schoolForm.reset();
+          document.getElementById("schoolId").value = "";
+          schoolModalTitle.textContent = "Add New School";
+          updateDistrictForm("");
+        }
+
+        // Open modal - FIXED to ensure modals display properly
+        function openModal(modal) {
+          if (!modal) {
+            console.error("Modal element not found");
+            return;
+          }
+          modal.style.display = "block";
+          document.body.style.overflow = "hidden"; // Prevent scrolling
+        }
+
+        // Close modal - FIXED to ensure modals close properly
+        function closeModal(modal) {
+          if (!modal) {
+            console.error("Modal element not found");
+            return;
+          }
+          modal.style.display = "none";
+          document.body.style.overflow = "auto"; // Enable scrolling
+        }
+
+        // View school details function
+        function viewSchool(id) {
+          const school = allSchools.find((s) => s.id === id);
           if (!school) return;
 
-          document.getElementById('schoolDetails').innerHTML = `
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                      <p class="text-sm text-gray-500">Index Number</p>
-                      <p class="font-medium">${school.index_number}</p>
-                  </div>
-                  <div>
-                      <p class="text-sm text-gray-500">School Name</p>
-                      <p class="font-medium">${school.name}</p>
-                  </div>
-                  <div>
-                      <p class="text-sm text-gray-500">Province</p>
-                      <p class="font-medium">${school.province}</p>
-                  </div>
-                  <div>
-                      <p class="text-sm text-gray-500">District</p>
-                      <p class="font-medium">${school.district}</p>
-                  </div>
-                  <div>
-                      <p class="text-sm text-gray-500">Created On</p>
-                      <p class="font-medium">${new Date(school.created_at).toLocaleString()}</p>
-                  </div>
-                  <div>
-                      <p class="text-sm text-gray-500">Last Updated</p>
-                      <p class="font-medium">${new Date(school.updated_at || school.created_at).toLocaleString()}</p>
-                  </div>
-              </div>
-          `;
+          document.getElementById("schoolDetails").innerHTML = `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p class="text-sm text-gray-500">Index Number</p>
+              <p class="font-medium">${school.index_number}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">School Name</p>
+              <p class="font-medium">${school.name}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">Province</p>
+              <p class="font-medium">${school.province}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">District</p>
+              <p class="font-medium">${school.district}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500">Created On</p>
+              <p class="font-medium">${new Date(
+                school.created_at
+              ).toLocaleString()}</p>
+            </div>
+
+          </div>
+        `;
 
           // Populate creator details if available
           if (school.created_by) {
-              document.getElementById('creatorDetails').innerHTML = `
-                  <div class="bg-gray-100 rounded-full h-10 w-10 flex items-center justify-center mr-3">
-                      <span class="text-gray-600 font-medium">${school.created_by.username ? school.created_by.username.charAt(0).toUpperCase() : 'U'}</span>
-                  </div>
-                  <div>
-                      <p class="font-medium">${school.created_by.full_name || school.created_by.username || 'Unknown User'}</p>
-                      <p class="text-sm text-gray-500">${school.created_by.email || ''}</p>
-                  </div>
-              `;
+            document.getElementById("creatorDetails").innerHTML = `
+            <div class="bg-gray-100 rounded-full h-10 w-10 flex items-center justify-center mr-3">
+              <span class="text-gray-600 font-medium">${
+                school.created_by.first_name
+                  ? school.created_by.first_name.charAt(0).toUpperCase()
+                  : "U"
+              }</span>
+            </div>
+            <div>
+              <p class="font-medium">${
+                school.created_by.first_name ||
+                school.created_by.last_name ||
+                "Unknown User"
+              }</p>
+              <p class="text-sm text-gray-500">${
+                school.created_by.email || ""
+              }</p>
+            </div>
+          `;
           } else {
-              document.getElementById('creatorDetails').innerHTML = `
-                  <p class="text-gray-500">Information not available</p>
-              `;
+            document.getElementById("creatorDetails").innerHTML = `
+            <p class="text-gray-500">Information not available</p>
+          `;
           }
 
           openModal(viewSchoolModal);
-      }
+        }
 
-      // Edit school function
-      function editSchool(id) {
-          const school = allSchools.find(s => s.id === id);
+        // Edit school function
+        function editSchool(id) {
+          const school = allSchools.find((s) => s.id === id);
           if (!school) return;
 
           // Set form values
-          document.getElementById('schoolId').value = school.id;
-          document.getElementById('indexNumber').value = school.index_number;
-          document.getElementById('schoolName').value = school.name;
-          document.getElementById('province').value = school.province;
+          document.getElementById("schoolId").value = school.id;
+          document.getElementById("indexNumber").value = school.index_number;
+          document.getElementById("schoolName").value = school.name;
+          document.getElementById("province").value = school.province;
 
           // Update district dropdown based on selected province
           updateDistrictForm(school.province);
 
           // Set district value after dropdown is updated
           setTimeout(() => {
-              document.getElementById('district').value = school.district;
+            document.getElementById("district").value = school.district;
           }, 100);
 
           // Update modal title
-          schoolModalTitle.textContent = 'Edit School';
+          schoolModalTitle.textContent = "Edit School";
 
           // Open modal
           openModal(schoolModal);
-      }
+        }
 
-      // Delete school function
-      function deleteSchool(id, name) {
+        // Delete school function
+        function deleteSchool(id, name) {
           currentSchoolId = id;
-          document.getElementById('deleteSchoolName').textContent = name;
+          document.getElementById("deleteSchoolName").textContent = name;
           openModal(deleteModal);
-      }
+        }
 
-      // Check auth status and load user info
-      function checkAuthStatus() {
-          const token = getAccessToken();
-          if (!token) {
-              window.location.href = '/login';
-              return;
+        // Handle pagination click
+        document
+          .getElementById("paginationControls")
+          .addEventListener("click", function (e) {
+            const pageButton = e.target.closest("[data-page]");
+            if (!pageButton) return;
+
+            const totalPages = Math.ceil(filteredSchools.length / itemsPerPage);
+
+            if (pageButton.dataset.page === "prev") {
+              if (currentPage > 1) {
+                currentPage--;
+              }
+            } else if (pageButton.dataset.page === "next") {
+              if (currentPage < totalPages) {
+                currentPage++;
+              }
+            } else {
+              currentPage = parseInt(pageButton.dataset.page);
+            }
+
+            renderSchoolsTable();
+            renderPagination();
+          });
+
+        // Handle items per page change
+        itemsPerPageSelect.addEventListener("change", function () {
+          itemsPerPage = parseInt(this.value);
+          currentPage = 1; // Reset to first page
+          renderSchoolsTable();
+          renderPagination();
+        });
+
+        // Handle province filter change
+        provinceFilter.addEventListener("change", function () {
+          updateDistrictFilter(this.value);
+          applyFilters();
+        });
+
+        // Handle district filter change
+        districtFilter.addEventListener("change", function () {
+          applyFilters();
+        });
+
+        // Handle form province change
+        document
+          .getElementById("province")
+          .addEventListener("change", function () {
+            updateDistrictForm(this.value);
+          });
+
+        // Handle add school button click - FIXED to properly open modal
+        document
+          .getElementById("addSchoolBtn")
+          .addEventListener("click", function () {
+            resetSchoolForm();
+            openModal(schoolModal);
+          });
+
+        // Handle cancel school form
+        document
+          .getElementById("cancelSchoolForm")
+          .addEventListener("click", function () {
+            closeModal(schoolModal);
+          });
+
+        // Handle close school modal
+        document
+          .getElementById("closeSchoolModal")
+          .addEventListener("click", function () {
+            closeModal(schoolModal);
+          });
+
+        // Handle close view modal
+        document
+          .getElementById("closeViewModal")
+          .addEventListener("click", function () {
+            closeModal(viewSchoolModal);
+          });
+
+        // Handle close view button
+        document
+          .getElementById("closeViewBtn")
+          .addEventListener("click", function () {
+            closeModal(viewSchoolModal);
+          });
+
+        // Handle close delete modal
+        document
+          .getElementById("closeDeleteModal")
+          .addEventListener("click", function () {
+            closeModal(deleteModal);
+          });
+
+        // Handle cancel delete
+        document
+          .getElementById("cancelDelete")
+          .addEventListener("click", function () {
+            closeModal(deleteModal);
+          });
+
+        // Handle school form submit
+        // Uncomment and fix the API call in the school form submit handler
+        schoolForm.addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const schoolId = document.getElementById("schoolId").value;
+          const indexNumber = document.getElementById("indexNumber").value;
+          const name = document.getElementById("schoolName").value;
+          const province = document.getElementById("province").value;
+          const district = document.getElementById("district").value;
+
+          // Validate form
+          if (!indexNumber || !name || !province || !district) {
+            showAlert("All fields are required.", "error");
+            return;
           }
 
-          // Get user info from token or API
-          fetch('/auth/user-info/', {
+          // Show loading state
+          saveSchoolBtn.disabled = true;
+          saveSchoolBtn.classList.add("btn-loading");
+
+          try {
+            const token = getAccessToken();
+
+            const schoolData = {
+              index_number: indexNumber,
+              name: name,
+              province: province,
+              district: district,
+            };
+
+            let url, method;
+
+            if (schoolId) {
+              // Update existing school
+              url = `/school/update/${schoolId}/`;
+              method = "PUT";
+            } else {
+              // Create new school
+              url = "/school/create/";
+              method = "POST";
+            }
+
+            const response = await fetch(url, {
+              method: method,
               headers: {
-                  'Authorization': `Bearer ${token}`
-              }
-          })
-          .then(response => {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(schoolData),
+            });
+
+            if (!response.ok) {
+              const data = await response.json();
+              throw new Error(data.error || "Failed to save school");
+            }
+
+            // Fetch updated schools data after successful operation
+            await fetchSchools();
+
+            // Success
+            closeModal(schoolModal);
+            showAlert(
+              `School ${schoolId ? "updated" : "created"} successfully!`,
+              "success"
+            );
+          } catch (error) {
+            showAlert(error.message, "error");
+          } finally {
+            // Reset loading state
+            saveSchoolBtn.disabled = false;
+            saveSchoolBtn.classList.remove("btn-loading");
+          }
+        });
+
+        // Fix the delete confirmation handler to use authorization
+        document
+          .getElementById("confirmDelete")
+          .addEventListener("click", async function () {
+            if (!currentSchoolId) return;
+
+            try {
+              const token = getAccessToken();
+
+              const response = await fetch(
+                `/school/delete/${currentSchoolId}/`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                  },
+                }
+              );
+
               if (!response.ok) {
-                  throw new Error('Unauthorized');
+                const data = await response.json();
+                throw new Error(data.error || "Failed to delete school");
               }
-              return response.json();
-          })
-          .then(data => {
-              // Update UI with user info
-              userNameDisplay.textContent = data.full_name || data.username || 'User';
-          })
-          .catch(error => {
-              console.error('Auth error:', error);
-              localStorage.removeItem('accessToken');
-              window.location.href = '/login';
+
+              // Fetch updated schools after deletion
+              await fetchSchools();
+
+              // Success
+              closeModal(deleteModal);
+              showAlert("School deleted successfully!", "success");
+            } catch (error) {
+              showAlert(error.message, "error");
+            }
           });
-      }
 
-      // Initialize the page
-      function initPage() {
-          checkAuthStatus();
-          initializeProvinceFilter();
-          initializeProvinceForm();
-          fetchSchools();
-      }
+        // Make functions globally accessible
+        window.viewSchool = viewSchool;
+        window.editSchool = editSchool;
+        window.deleteSchool = deleteSchool;
 
-      // Make functions globally accessible
-      window.viewSchool = viewSchool;
-      window.editSchool = editSchool;
-      window.deleteSchool = deleteSchool;
+        // Initialize the page
+        initializeProvinceFilter();
+        initializeProvinceForm();
+        fetchSchools();
 
-      // Initialize on load
-      initPage();
+        // Add a function to check if the token is valid and redirect to login if not
+        function checkAuthStatus() {
+          const token = getAccessToken();
+          if (!token) {
+            window.location.href = "/login"; // Redirect to login page if no token
+            return false;
+          }
+          return true;
+        }
+
+        // Call this function when the page loads
+        document.addEventListener("DOMContentLoaded", function () {
+          if (checkAuthStatus()) {
+            initializeProvinceFilter();
+            initializeProvinceForm();
+            fetchSchools();
+          }
+        });
+      });
     </script>
   </body>
 </html>

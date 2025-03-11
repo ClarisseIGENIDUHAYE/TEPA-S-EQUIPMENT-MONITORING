@@ -12,8 +12,6 @@ def display_schools_page(request):
     return render(request, 'school/allSchools.html')
 
 
-def get_createSchool_page(request):
-    return render(request, 'school/createSchool.html')
 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
@@ -57,6 +55,7 @@ def get_all_schools(request):
     try:
         schools = School.objects.all()
         serializer = SchoolSerializer(schools, many=True)
+        print(f"\n\n Found schools Data: {serializer.data} \n\n")
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": f"An unexpected error occurred: {str(e)}"},
