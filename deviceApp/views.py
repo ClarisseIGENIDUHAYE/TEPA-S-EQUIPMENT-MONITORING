@@ -1,194 +1,201 @@
-# deviceApp/views.py
-from rest_framework import status
-from rest_framework.response import Response
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.timezone import now
+from django.shortcuts import get_object_or_404, render
+from rest_framework.parsers import JSONParser
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
 from .models import Device
 from .serializers import DeviceSerializer
-from schoolApp.models import School
-import re
 
-# Completely independent functions for each operation
+def get_device_page(request):
+    return render(request, 'device/manage.html')
+
+
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_all_devices(request):
-    """Get all devices"""
+def get_device_list(request):
     devices = Device.objects.all()
     serializer = DeviceSerializer(devices, many=True)
-    return Response(serializer.data)
+    
+    # print(f"\n\n Retrived devices data: {serializer.data.name}\n\n")
+    return JsonResponse(serializer.data, safe=False)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_device_detail(request, device_id):
+    device = get_object_or_404(Device, id=device_id)
+    serializer = DeviceSerializer(device)
+    return JsonResponse(serializer.data)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_device(request):
-    """Create a new device with validation"""
-    data = request.data
+    """
+    Create a new device with duplicate validation and automatic connectivity check
+    """
+    data = JSONParser().parse(request)
+    data['created_by'] = request.user
     
-    # Validate required fields
-    required_fields = ['name', 'mac_address', 'type', 'school_id']
-    for field in required_fields:
-        if field not in data:
-            return Response({'error': f'Field {field} is required'}, status=status.HTTP_400_BAD_REQUEST)
+    # Normalize MAC address format if provided
+    if 'mac_address' in data:
+        mac = data['mac_address'].upper()
+        mac = mac.replace(':', '').replace('-', '').replace('.', '')
+        if len(mac) == 12:
+            # Format consistently as XX:XX:XX:XX:XX:XX
+            data['mac_address'] = ':'.join(mac[i:i+2] for i in range(0, 12, 2))
     
-    # Validate MAC address format
-    mac_pattern = re.compile(r'^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$')
+    # Check for duplicates manually before creating
     mac_address = data.get('mac_address')
-    if not mac_pattern.match(mac_address):
-        return Response({'error': 'Invalid MAC address format'}, status=status.HTTP_400_BAD_REQUEST)
+    ip_address = data.get('ip_address')
+    name = data.get('name')
+    school_id = data.get('school_id')
     
-    # Check if MAC address is unique
-    if Device.objects.filter(mac_address=mac_address).exists():
-        return Response({'error': 'Device with this MAC address already exists'}, status=status.HTTP_400_BAD_REQUEST)
+    # MAC address must be unique across all schools
+    if mac_address and Device.objects.filter(mac_address=data['mac_address']).exists():
+        return JsonResponse({
+            'error': 'duplicate_mac',
+            'message': f"Device with MAC address '{mac_address}' already exists"
+        }, status=400)
     
-    # Validate device type
-    if data.get('type') not in dict(Device.DEVICE_TYPES):
-        return Response({'error': 'Invalid device type'}, status=status.HTTP_400_BAD_REQUEST)
+    # Name+School and IP+School should be unique combinations
+    if school_id:
+        if name and Device.objects.filter(name__iexact=name, school=school_id).exists():
+            return JsonResponse({
+                'error': 'duplicate_name',
+                'message': f"Device with name '{name}' already exists in this school"
+            }, status=400)
+        
+        if ip_address and Device.objects.filter(ip_address=ip_address, school=school_id).exists():
+            return JsonResponse({
+                'error': 'duplicate_ip',
+                'message': f"Device with IP address '{ip_address}' already exists in this school"
+            }, status=400)
     
-    # Validate status if provided
-    if 'status' in data and data.get('status') not in dict(Device.STATUS_CHOICES):
-        return Response({'error': 'Invalid status'}, status=status.HTTP_400_BAD_REQUEST)
+    serializer = DeviceSerializer(data=data, context={'request': request})
+    if serializer.is_valid():
+        device = serializer.save()
+        
+        # Immediately check connectivity for the new device
+        try:
+            device.check_connectivity()
+            # Re-serialize to include the updated connectivity information
+            updated_serializer = DeviceSerializer(device)
+            return JsonResponse(updated_serializer.data, status=201)
+        except Exception as e:
+            # Still return success but include the error
+            return JsonResponse({
+                **serializer.data,
+                'connectivity_check_error': str(e)
+            }, status=201)
     
-    # Validate school exists
-    try:
-        school = School.objects.get(id=data.get('school_id'))
-    except School.DoesNotExist:
-        return Response({'error': 'School with given ID does not exist'}, status=status.HTTP_400_BAD_REQUEST)
-    
-    # Create the device
-    device = Device.objects.create(
-        name=data.get('name'),
-        mac_address=data.get('mac_address'),
-        ip_address=data.get('ip_address'),
-        type=data.get('type'),
-        status=data.get('status', 'unknown'),
-        school=school,
-        created_by=request.user
-    )
-    
-    serializer = DeviceSerializer(device)
-    return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return JsonResponse(serializer.errors, status=400)
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_device_by_id(request, pk):
-    """Get a single device by its ID"""
-    try:
-        device = Device.objects.get(pk=pk)
-        serializer = DeviceSerializer(device)
-        return Response(serializer.data)
-    except Device.DoesNotExist:
-        return Response({'error': 'Device not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def update_device(request, pk):
-    """Update a device with validation"""
-    try:
-        device = Device.objects.get(pk=pk)
-    except Device.DoesNotExist:
-        return Response({'error': 'Device not found'}, status=status.HTTP_404_NOT_FOUND)
-        
-    data = request.data
+def update_device(request, device_id):
+    """
+    Update a device with duplicate validation and automatic connectivity check
+    """
+    device = get_object_or_404(Device, id=device_id)
+    data = JSONParser().parse(request)
     
-    # Validate MAC address format if provided
+    # Normalize MAC address format if provided
     if 'mac_address' in data:
-        mac_pattern = re.compile(r'^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$')
-        mac_address = data.get('mac_address')
-        if not mac_pattern.match(mac_address):
-            return Response({'error': 'Invalid MAC address format'}, status=status.HTTP_400_BAD_REQUEST)
+        mac = data['mac_address'].upper()
+        mac = mac.replace(':', '').replace('-', '').replace('.', '')
+        if len(mac) == 12:
+            # Format consistently as XX:XX:XX:XX:XX:XX
+            data['mac_address'] = ':'.join(mac[i:i+2] for i in range(0, 12, 2))
+    
+    # Check for duplicates manually before updating
+    mac_address = data.get('mac_address')
+    ip_address = data.get('ip_address')
+    name = data.get('name')
+    school_id = data.get('school_id')
+    
+    # MAC address must be unique across all schools
+    if mac_address and Device.objects.filter(mac_address=data['mac_address']).exclude(id=device_id).exists():
+        return JsonResponse({
+            'error': 'duplicate_mac',
+            'message': f"Device with MAC address '{mac_address}' already exists"
+        }, status=400)
+    
+    # Name+School and IP+School should be unique combinations
+    if school_id:
+        if name and Device.objects.filter(name__iexact=name, school=school_id).exclude(id=device_id).exists():
+            return JsonResponse({
+                'error': 'duplicate_name',
+                'message': f"Device with name '{name}' already exists in this school"
+            }, status=400)
         
-        # Check if MAC address is unique (excluding this device)
-        if Device.objects.filter(mac_address=mac_address).exclude(id=pk).exists():
-            return Response({'error': 'Device with this MAC address already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        if ip_address and Device.objects.filter(ip_address=ip_address, school=school_id).exclude(id=device_id).exists():
+            return JsonResponse({
+                'error': 'duplicate_ip',
+                'message': f"Device with IP address '{ip_address}' already exists in this school"
+            }, status=400)
     
-    # Validate device type if provided
-    if 'type' in data and data.get('type') not in dict(Device.DEVICE_TYPES):
-        return Response({'error': 'Invalid device type'}, status=status.HTTP_400_BAD_REQUEST)
+    serializer = DeviceSerializer(device, data=data, partial=True)
+    if serializer.is_valid():
+        updated_device = serializer.save()
+        
+        # If IP address changed, immediately check connectivity
+        ip_changed = 'ip_address' in data and data['ip_address'] != device.ip_address
+        if ip_changed or request.query_params.get('check_connectivity') == 'true':
+            try:
+                updated_device.check_connectivity()
+                # Re-serialize to include the updated connectivity information
+                updated_serializer = DeviceSerializer(updated_device)
+                return JsonResponse(updated_serializer.data)
+            except Exception as e:
+                # Still return success but include the error
+                return JsonResponse({
+                    **serializer.data,
+                    'connectivity_check_error': str(e)
+                })
+        
+        return JsonResponse(serializer.data)
     
-    # Validate status if provided
-    if 'status' in data and data.get('status') not in dict(Device.STATUS_CHOICES):
-        return Response({'error': 'Invalid status'}, status=status.HTTP_400_BAD_REQUEST)
-    
-    # Validate school exists if provided
-    if 'school_id' in data:
-        try:
-            school = School.objects.get(id=data.get('school_id'))
-            device.school = school
-        except School.DoesNotExist:
-            return Response({'error': 'School with given ID does not exist'}, status=status.HTTP_400_BAD_REQUEST)
-    
-    # Update fields
-    if 'name' in data:
-        device.name = data.get('name')
-    if 'mac_address' in data:
-        device.mac_address = data.get('mac_address')
-    if 'ip_address' in data:
-        device.ip_address = data.get('ip_address')
-    if 'type' in data:
-        device.type = data.get('type')
-    if 'status' in data:
-        device.status = data.get('status')
-    
-    device.save()
-    serializer = DeviceSerializer(device)
-    return Response(serializer.data)
+    return JsonResponse(serializer.errors, status=400)
+
+
+
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-def delete_device(request, pk):
-    """Delete a device by its ID"""
-    try:
-        device = Device.objects.get(pk=pk)
-        device.delete()
-        return Response({'message': 'Device deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
-    except Device.DoesNotExist:
-        return Response({'error': 'Device not found'}, status=status.HTTP_404_NOT_FOUND)
+def delete_device(request, device_id):
+    device = get_object_or_404(Device, id=device_id)
+    device.delete()
+    return JsonResponse({'message': 'Device deleted successfully'}, status=204)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_user_devices(request):
-    """Get all devices created by the logged-in user"""
-    devices = Device.objects.filter(created_by=request.user)
-    serializer = DeviceSerializer(devices, many=True)
-    return Response(serializer.data)
+def check_device_status(request, device_id):
+    device = get_object_or_404(Device, id=device_id)
+    status = device.status  # Calls the property method
+    return JsonResponse({'device_id': device_id, 'status': status})
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_devices_by_status(request, status_value):
-    """Get devices filtered by status"""
-    # Validate status
-    if status_value not in dict(Device.STATUS_CHOICES):
-        return Response({'error': 'Invalid status value'}, status=status.HTTP_400_BAD_REQUEST)
-        
-    devices = Device.objects.filter(status=status_value)
-    serializer = DeviceSerializer(devices, many=True)
-    return Response(serializer.data)
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_devices_by_district(request, district):
-    """Get devices filtered by school district"""
-    devices = Device.objects.filter(school__district=district)
-    serializer = DeviceSerializer(devices, many=True)
-    return Response(serializer.data)
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_devices_by_province(request, province):
-    """Get devices filtered by school province"""
-    devices = Device.objects.filter(school__province=province)
-    serializer = DeviceSerializer(devices, many=True)
-    return Response(serializer.data)
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_devices_by_school(request, school_id):
-    """Get devices for a specific school"""
-    try:
-        school = School.objects.get(id=school_id)
-        devices = Device.objects.filter(school=school)
-        serializer = DeviceSerializer(devices, many=True)
-        return Response(serializer.data)
-    except School.DoesNotExist:
-        return Response({'error': 'School not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

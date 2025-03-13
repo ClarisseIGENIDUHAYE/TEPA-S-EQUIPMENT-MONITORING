@@ -444,16 +444,16 @@
           <i class="fas fa-school"></i>
           My Schools
         </a>
-        <a href="#" class="sidebar-item">
+        <a href="{% url 'get_device_page' %}" class="sidebar-item">
           <i class="fas fa-desktop"></i>
           Devices
         </a>
 
-        <a href="#" class="sidebar-item">
+        {% comment %} <a href="#" class="sidebar-item">
           <i class="fas fa-calendar-alt"></i>
           Sessions Information
-        </a>
-        <a href="#" class="sidebar-item active">
+        </a> {% endcomment %}
+        <a href="{% url 'get_updateForm' %}" class="sidebar-item active">
           <i class="fas fa-cog"></i>
           Account Setting
         </a>
