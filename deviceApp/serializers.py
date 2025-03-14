@@ -66,10 +66,18 @@ class DeviceSerializer(serializers.ModelSerializer):
                 return 'error'
                 
             # Force a new connectivity check
-            is_online = obj.check_connectivity()
+            result = obj.check_connectivity()
+            
+            # Check status from the result dictionary
+            if isinstance(result, dict) and 'status' in result:
+                status = result['status']
+            else:
+                # Fall back to boolean interpretation if result is not a dict
+                is_online = bool(result)
+                status = 'online' if is_online else 'offline'
             
             # Check if it's reachable but has connectivity error
-            if is_online:
+            if status == 'online':
                 return 'online'
             elif obj.connectivity_error and 'reachable but has no internet' in obj.connectivity_error:
                 return 'no_internet'  # New status for devices that are up but can't access internet
@@ -108,9 +116,48 @@ class DeviceSerializer(serializers.ModelSerializer):
                 details['status_detail'] = "Device is reachable but appears to be offline"
             else:
                 details['status_detail'] = "Device is offline or unreachable"
+        
+        # Add connection metrics if available
+        try:
+            if hasattr(obj, 'get_connectivity_metrics'):
+                metrics = obj.get_connectivity_metrics()
+                if metrics:
+                    details['metrics'] = metrics
+            
+            # Also add connection_details from the model if available
+            if hasattr(obj, 'connection_details'):
+                conn_details = obj.connection_details
+                if conn_details:
+                    # Add specific fields we want from connection_details
+                    if 'ping_check' in conn_details:
+                        details['ping_metrics'] = conn_details['ping_check']
+                    if 'port_check' in conn_details:
+                        details['port_metrics'] = conn_details['port_check']
+        except Exception as e:
+            details['metrics_error'] = str(e)
                 
         return details  
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+# created_by_id = serializers.PrimaryKeyRelatedField(
+#         queryset=CustomUser.objects.all(),
+#         write_only=True,
+#         source='created_by',
+#         required=False  # Make it not required since you set it in the view
+#     )
     
     
     

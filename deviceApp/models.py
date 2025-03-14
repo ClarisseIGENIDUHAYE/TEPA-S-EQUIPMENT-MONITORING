@@ -2,34 +2,14 @@ from django.db import models
 from django.utils.timezone import now
 from schoolApp.models import School
 from userApp.models import CustomUser
-import socket
-import subprocess
-import platform
 from datetime import datetime
-from .utils import check_device_connectivity_with_params
+import json
 
-# Add this utility function at the top of the file
-def check_device_internet_connectivity():
-    """
-    Check if the host machine has internet connectivity
-    Returns True if it has internet access, False otherwise
-    """
-    import socket
-    try:
-        # Try to connect to Google's DNS server
-        socket.create_connection(("8.8.8.8", 53), timeout=3)
-        return True
-    except OSError:
-        pass
-    
-    try:
-        # Try to connect to Cloudflare's DNS server as a backup
-        socket.create_connection(("1.1.1.1", 53), timeout=3)
-        return True
-    except OSError:
-        pass
-        
-    return False
+from .utils import (
+    check_device_connectivity_with_params,
+    check_internet_connectivity,
+    is_valid_ipv4
+)
 
 class Device(models.Model):
     DEVICE_TYPES = (
@@ -51,24 +31,23 @@ class Device(models.Model):
     last_updated = models.DateTimeField(auto_now=True)
     last_connectivity = models.DateTimeField(null=True, blank=True)
     
-    # Adding ports to check for connectivity
+    # Connectivity settings
     check_ports = models.CharField(max_length=255, blank=True, null=True, 
-                                   help_text="Comma-separated ports to check (e.g., '80,443,22')")
-    
-    # Whether to use ping as fallback when port check fails
+                                  help_text="Comma-separated ports to check (e.g., '80,443,22')")
     use_ping_fallback = models.BooleanField(default=True)
+    ping_count = models.IntegerField(default=3)
+    timeout = models.IntegerField(default=5)
+    retry_count = models.IntegerField(default=2)
     
-    # New field to track last attempted connectivity check
+    # Status tracking fields
     last_check_attempt = models.DateTimeField(null=True, blank=True)
-    
-    # New field to store internet connection error if occurred
     connectivity_error = models.CharField(max_length=255, blank=True, null=True)
+    connectivity_details = models.TextField(blank=True, null=True)
     
     class Meta:
         ordering = ['-last_updated']
-        # Add additional unique constraints to prevent duplicates
         unique_together = [
-            ('name', 'school', 'ip_address'),  # Prevent same name+school+IP combinations
+            ('name', 'school', 'ip_address'),
         ]
     
     def __str__(self):
@@ -76,112 +55,191 @@ class Device(models.Model):
     
     @property
     def status(self):
-        """Dynamic property that always returns the current status based on connectivity check"""
+        """Dynamic property that returns the current connectivity status"""
         try:
-            return 'online' if self.check_connectivity() else 'offline'
+            latest_check = self.check_connectivity()
+            return latest_check.get('status', 'unknown')
         except Exception as e:
             self.connectivity_error = str(e)
             self.save(update_fields=['connectivity_error'])
             return 'error'
     
-    def check_connectivity(self):
+    @property
+    def connection_details(self):
+        """Returns the latest connectivity check details as a dictionary"""
+        if self.connectivity_details:
+            try:
+                return json.loads(self.connectivity_details)
+            except json.JSONDecodeError:
+                return {}
+        return {}
+    
+    def check_connectivity(self, save_result=True):
         """
-        Check if the device is online using both port checks and ping
-        Also verifies that the device itself has internet connectivity
-        Returns True if online and has internet access, False otherwise.
-        Updates the last_check_attempt timestamp regardless of outcome.
+        Check if the device is online using both port checks and ping based on the utils module.
+        Updates device status fields and returns the detailed result dictionary.
+        
+        Parameters:
+        - save_result: Whether to save the result to the database
+        
+        Returns: 
+        - Dictionary with detailed connectivity information
         """
-        # Always update the last check attempt time
+        # Update check attempt timestamp
         self.last_check_attempt = now()
         self.connectivity_error = None
         
+        # Basic validation
         if not self.ip_address:
             self.connectivity_error = "No IP address configured"
-            self.save(update_fields=['last_check_attempt', 'connectivity_error'])
-            return False
-        
-        # First, check if host has internet connectivity
-        try:
-            if not check_device_internet_connectivity():
-                self.connectivity_error = "Host machine has no internet connection"
+            if save_result:
                 self.save(update_fields=['last_check_attempt', 'connectivity_error'])
-                return False
-        except Exception as e:
-            self.connectivity_error = f"Error checking host connectivity: {str(e)}"
-            self.save(update_fields=['last_check_attempt', 'connectivity_error'])
-            return False
+            return {'status': 'offline', 'error': self.connectivity_error}
+            
+        if not is_valid_ipv4(self.ip_address):
+            self.connectivity_error = "Invalid IP address format"
+            if save_result:
+                self.save(update_fields=['last_check_attempt', 'connectivity_error'])
+            return {'status': 'offline', 'error': self.connectivity_error}
         
-        # Use the enhanced connectivity check function
+        # Check if host machine has internet connectivity
+        if not check_internet_connectivity():
+            self.connectivity_error = "Host machine has no internet connection"
+            if save_result:
+                self.save(update_fields=['last_check_attempt', 'connectivity_error'])
+            return {'status': 'unknown', 'error': self.connectivity_error}
+        
+        # Use the enhanced connectivity check function from utils
         result = check_device_connectivity_with_params(
             ip_address=self.ip_address,
             device_type=self.type,
             ports=self.check_ports,
-            use_ping_fallback=self.use_ping_fallback
+            use_ping_fallback=self.use_ping_fallback,
+            ping_count=self.ping_count,
+            timeout=self.timeout,
+            retry_count=self.retry_count
         )
         
-        # Update device state based on check results
+        # Update device fields based on check results
         if result['status'] == 'online':
             self.last_connectivity = now()
-            self.save(update_fields=['last_connectivity', 'last_check_attempt', 'connectivity_error'])
-            return True
+            self.connectivity_error = None
         else:
             self.connectivity_error = result.get('error', 'Device is unreachable')
-            self.save(update_fields=['last_check_attempt', 'connectivity_error'])
-            return False
         
-    
-    
-    
-    
-    def check_router_internet_connectivity(self):
-        """
-        For router devices, attempt to verify they have internet connectivity
-        by checking common router APIs or interfaces
-        """
-        import requests
-        from requests.exceptions import RequestException
+        # Store the detailed results 
+        self.connectivity_details = json.dumps(result)
         
-        # Common router status URLs that might indicate internet status
-        router_urls = [
-            f"http://{self.ip_address}/status.html",
-            f"http://{self.ip_address}/router_status.cgi",
-            f"http://{self.ip_address}/cgi-bin/luci/admin/status/overview",
-            f"http://{self.ip_address}/internet_status.asp"
-        ]
-        
-        # Try each URL to see if we can get router status
-        for url in router_urls:
-            try:
-                response = requests.get(url, timeout=2, verify=False)
-                if response.status_code == 200:
-                    # Check if response contains indicators of internet connectivity
-                    content = response.text.lower()
-                    if any(term in content for term in ['internet connected', 'wan up', 'online status: connected']):
-                        return True
-            except RequestException:
-                continue
+        if save_result:
+            fields_to_update = [
+                'last_check_attempt', 
+                'connectivity_error', 
+                'connectivity_details'
+            ]
+            
+            if result['status'] == 'online':
+                fields_to_update.append('last_connectivity')
                 
-        # If no status page found, try probing the router's DNS functionality
-        try:
-            # Configure DNS resolution to use the router
-            original_nameserver = socket.gethostbyname_ex
+            self.save(update_fields=fields_to_update)
+        
+        return result
+    
+    def get_connectivity_metrics(self):
+        """
+        Returns consolidated connectivity metrics based on the latest check
+        """
+        details = self.connection_details
+        
+        metrics = {
+            'status': self.status,
+            'last_check': self.last_check_attempt,
+            'last_online': self.last_connectivity,
+            'error': self.connectivity_error
+        }
+        
+        # Extract ping metrics if available
+        if details and 'ping_check' in details:
+            ping_data = details['ping_check']
+            if ping_data:
+                metrics.update({
+                    'latency_ms': ping_data.get('latency_ms'),
+                    'packet_loss': ping_data.get('packet_loss')
+                })
+        
+        # Extract port check metrics if available
+        if details and 'port_check' in details:
+            port_data = details['port_check']
+            if port_data:
+                metrics.update({
+                    'ports_checked': port_data.get('ports_checked'),
+                    'ports_open': port_data.get('ports_open'),
+                    'open_ports': port_data.get('open_ports')
+                })
+        
+        return metrics
+    
+    def bulk_check_devices(cls, school_id=None, device_type=None):
+        """
+        Class method to check connectivity for multiple devices with filtering options
+        
+        Parameters:
+        - school_id: Optional filter by school
+        - device_type: Optional filter by device type
+        
+        Returns:
+        - Dictionary with summary and individual device results
+        """
+        filters = {}
+        if school_id:
+            filters['school_id'] = school_id
+        if device_type:
+            filters['type'] = device_type
             
-            def custom_resolver(host):
-                return socket.getaddrinfo(host, None, family=socket.AF_INET, proto=socket.IPPROTO_TCP)
+        devices = cls.objects.filter(**filters)
+        
+        results = {
+            'timestamp': datetime.now().isoformat(),
+            'total_devices': devices.count(),
+            'online_count': 0,
+            'offline_count': 0,
+            'error_count': 0,
+            'details': {}
+        }
+        
+        for device in devices:
+            device_result = device.check_connectivity()
             
-            # Test if router can resolve a reliable domain
-            socket.gethostbyname_ex = custom_resolver
-            try:
-                socket.gethostbyname("www.google.com")
-                return True
-            except socket.gaierror:
-                return False
-            finally:
-                # Restore original resolver
-                socket.gethostbyname_ex = original_nameserver
-        except Exception:
-            pass
+            # Update counts
+            if device_result['status'] == 'online':
+                results['online_count'] += 1
+            elif device_result['status'] == 'offline':
+                results['offline_count'] += 1
+            else:
+                results['error_count'] += 1
+                
+            # Store detailed result
+            results['details'][device.id] = {
+                'name': device.name,
+                'ip': device.ip_address,
+                'type': device.type,
+                'status': device_result['status'],
+                'error': device_result.get('error'),
+                'school': device.school.name
+            }
             
-        # Default to true for routers that pass basic connectivity checks
-        # but don't have accessible status pages
-        return True
+            # Add latency if available
+            ping_data = device_result.get('ping_check', {})
+            if ping_data and ping_data.get('latency_ms') is not None:
+                results['details'][device.id]['latency_ms'] = ping_data['latency_ms']
+        
+        # Calculate summary statistics for online devices
+        online_devices = [details for _, details in results['details'].items() 
+                         if details['status'] == 'online' and 'latency_ms' in details]
+        
+        if online_devices:
+            latencies = [device['latency_ms'] for device in online_devices]
+            results['avg_latency_ms'] = sum(latencies) / len(latencies)
+            results['min_latency_ms'] = min(latencies)
+            results['max_latency_ms'] = max(latencies)
+        
+        return results

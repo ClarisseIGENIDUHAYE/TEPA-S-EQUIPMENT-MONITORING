@@ -446,14 +446,22 @@
           Devices
         </a>
 
-        {% comment %} <a href="#" class="sidebar-item">
+        {% comment %}
+        <a href="#" class="sidebar-item">
           <i class="fas fa-calendar-alt"></i>
           Sessions Information
-        </a> {% endcomment %}
+        </a>
+        {% endcomment %}
         <a href="{% url 'get_updateForm' %}" class="sidebar-item">
           <i class="fas fa-cog"></i>
           Account Setting
         </a>
+
+        <a href="{% url 'index' %}" class="sidebar-item">
+          <i class="fas fa-sign-out-alt"></i>
+          Logout
+      </a>
+      
       </aside>
 
       <div class="content-area">
@@ -534,64 +542,73 @@
 
           <!-- Devices Table -->
           <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Name
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Type
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    School
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    IP Address
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Status
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Last Connectivity
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody
-                id="devicesTableBody"
-                class="bg-white divide-y divide-gray-200"
-              >
-                <tr>
-                  <td colspan="7" class="px-6 py-4 text-center text-gray-500">
-                    Loading devices data...
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th
+                      scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Name
+                    </th>
+                    <th
+                      scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Type
+                    </th>
+                    <th
+                      scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      School
+                    </th>
+                    <th
+                      scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      IP Address
+                    </th>
+                    <th
+                      scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Connection Speed
+                    </th>
+                    <th
+                      scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Status
+                    </th>
+                    <th
+                      scope="col"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Last Connectivity
+                    </th>
+                    <th
+                      scope="col"
+                      class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody
+                  id="devicesTableBody"
+                  class="bg-white divide-y divide-gray-200"
+                >
+                  <tr>
+                    <td colspan="8" class="px-6 py-4 text-center text-gray-500">
+                      Loading devices data...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
           </div>
 
           <!-- Pagination Controls -->
@@ -735,6 +752,10 @@
                 <div id="detailLastConnectivity" class="detail-value"></div>
               </div>
               <div class="detail-row">
+                <div class="detail-label">Network Speed</div>
+                <div id="detailLastConnectivity" class="detail-value"></div>
+              </div>
+              <div class="detail-row">
                 <div class="detail-label">Last Check</div>
                 <div id="detailLastCheckAttempt" class="detail-value"></div>
               </div>
@@ -745,6 +766,12 @@
               <div class="detail-row">
                 <div class="detail-label">Ping Fallback</div>
                 <div id="detailUsePingFallback" class="detail-value"></div>
+              </div>
+              <div>
+                <span class="text-sm font-medium text-gray-500">Latency:</span>
+                <span id="detailLatency" class="ml-2 text-sm text-gray-900"
+                  >N/A</span
+                >
               </div>
               <div class="detail-row">
                 <div class="detail-label">Status</div>
@@ -779,654 +806,837 @@
     </div>
 
     <script>
-                    document.addEventListener("DOMContentLoaded", function () {
+      document.addEventListener("DOMContentLoaded", function () {
+        const userAvatar = document.getElementById("userAvatar");
+        const userName = document.getElementById("userName");
+        const userRole = document.getElementById("userRole");
 
-                        const userAvatar = document.getElementById("userAvatar");
-                        const userName = document.getElementById("userName");
-                        const userRole = document.getElementById("userRole");
-                
-                        const userData = JSON.parse(localStorage.getItem("userData") || "{}");
-                        console.log("User Data Loaded:", userData);
-                
-                        if (userData.first_name && userData.last_name) {
-                          userName.textContent = `${userData.first_name} ${userData.last_name}`;
-                        } else {
-                          userName.textContent = "Guest User";
-                        }
-                
-                        userRole.textContent = userData.role || "User";
-                
-                        if (userData.profile_picture) {
-                          userAvatar.innerHTML = `<img src="${userData.profile_picture}" alt="User Avatar">`;
-                        } else {
-                          userAvatar.innerHTML = `<i class="fas fa-user"></i>`;
-                        }
-                        // Rwanda provinces and districts data
-                        const rwandaData = {
-                            "Kigali City": ["Nyarugenge", "Gasabo", "Kicukiro"],
-                            "NORTH": ["Burera", "Gakenke", "Gicumbi", "Musanze", "Rulindo"],
-                            "SOUTH": [
-                                "Gisagara",
-                                "Huye",
-                                "Kamonyi",
-                                "Muhanga",
-                                "Nyamagabe",
-                                "Nyanza",
-                                "Nyaruguru",
-                                "Ruhango",
-                            ],
-                            "EAST": [
-                                "Bugesera",
-                                "Gatsibo",
-                                "Kayonza",
-                                "Kirehe",
-                                "Ngoma",
-                                "Nyagatare",
-                                "Rwamagana",
-                            ],
-                            "WEST": [
-                                "Karongi",
-                                "Ngororero",
-                                "Nyabihu",
-                                "Nyamasheke",
-                                "Rubavu",
-                                "Rusizi",
-                                "Rutsiro",
-                            ],
-                        };
+        const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+        console.log("User Data Loaded:", userData);
 
-                        // Global variables
-                        let allDevices = [];
-                        let filteredDevices = [];
-                        let allSchools = [];
-                        let currentPage = 1;
-                        let pageSize = 10;
-                        let currentDeviceId = null;
+        if (userData.first_name && userData.last_name) {
+          userName.textContent = `${userData.first_name} ${userData.last_name}`;
+        } else {
+          userName.textContent = "Guest User";
+        }
 
-                        // DOM elements
-                        const deviceModal = document.getElementById("deviceModal");
-                        const deviceDetailsModal = document.getElementById("deviceDetailsModal");
-                        const deleteConfirmModal = document.getElementById("deleteConfirmModal");
-                        const alertMessage = document.getElementById("alertMessage");
+        userRole.textContent = userData.role || "User";
 
-                        
+        if (userData.profile_picture) {
+          userAvatar.innerHTML = `<img src="${userData.profile_picture}" alt="User Avatar">`;
+        } else {
+          userAvatar.innerHTML = `<i class="fas fa-user"></i>`;
+        }
+        // Rwanda provinces and districts data
+        const rwandaData = {
+          "Kigali City": ["Nyarugenge", "Gasabo", "Kicukiro"],
+          NORTH: ["Burera", "Gakenke", "Gicumbi", "Musanze", "Rulindo"],
+          SOUTH: [
+            "Gisagara",
+            "Huye",
+            "Kamonyi",
+            "Muhanga",
+            "Nyamagabe",
+            "Nyanza",
+            "Nyaruguru",
+            "Ruhango",
+          ],
+          EAST: [
+            "Bugesera",
+            "Gatsibo",
+            "Kayonza",
+            "Kirehe",
+            "Ngoma",
+            "Nyagatare",
+            "Rwamagana",
+          ],
+          WEST: [
+            "Karongi",
+            "Ngororero",
+            "Nyabihu",
+            "Nyamasheke",
+            "Rubavu",
+            "Rusizi",
+            "Rutsiro",
+          ],
+        };
 
-                        // Fetch all schools
-                        async function fetchSchools() {
-                            try {
-                                const token = localStorage.getItem("accessToken");
-                                const response = await fetch("/school/schools/", {
-                                    method: "GET",
-                                    headers: {
-                                        "Authorization": `Bearer ${token}`,
-                                        "Content-Type": "application/json"
-                                    }
-                                });
+        // Global variables
+        let allDevices = [];
+        let filteredDevices = [];
+        let allSchools = [];
+        let currentPage = 1;
+        let pageSize = 10;
+        let currentDeviceId = null;
 
-                                if (!response.ok) throw new Error("Failed to fetch schools");
+        // DOM elements
+        const deviceModal = document.getElementById("deviceModal");
+        const deviceDetailsModal =
+          document.getElementById("deviceDetailsModal");
+        const deleteConfirmModal =
+          document.getElementById("deleteConfirmModal");
+        const alertMessage = document.getElementById("alertMessage");
 
-                                allSchools = await response.json();
-                                populateSchoolFilters();
-                                populateProvinceFilters();
-                            } catch (error) {
-                                console.error("Error fetching schools:", error);
-                                showAlert("Failed to load schools data. Please try again.", "error");
-                            }
-                        }
+        // Fetch all schools
+        async function fetchSchools() {
+          try {
+            const token = localStorage.getItem("accessToken");
+            const response = await fetch("/school/schools/", {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            });
 
-                        // Populate school filters
-                        function populateSchoolFilters() {
-                            const schoolFilter = document.getElementById("schoolFilter");
-                            const modalSchool = document.getElementById("modalSchool");
+            if (!response.ok) throw new Error("Failed to fetch schools");
 
-                            // Clear existing options
-                            schoolFilter.innerHTML = '<option value="">All Schools</option>';
-                            modalSchool.innerHTML = '<option value="">Select School</option>';
+            allSchools = await response.json();
+            populateSchoolFilters();
+            populateProvinceFilters();
+          } catch (error) {
+            console.error("Error fetching schools:", error);
+            showAlert(
+              "Failed to load schools data. Please try again.",
+              "error"
+            );
+          }
+        }
 
-                            // Add schools to filters
-                            allSchools.forEach(school => {
-                                const option = new Option(school.name, school.id);
-                                const modalOption = new Option(school.name, school.id);
-                                schoolFilter.appendChild(option);
-                                modalSchool.appendChild(modalOption);
-                            });
-                        }
+        // Populate school filters
+        function populateSchoolFilters() {
+          const schoolFilter = document.getElementById("schoolFilter");
+          const modalSchool = document.getElementById("modalSchool");
 
-                        // Populate province filters
-                        function populateProvinceFilters() {
-                            const provinceFilter = document.getElementById("provinceFilter");
-                            const modalProvince = document.getElementById("modalProvince");
+          // Clear existing options
+          schoolFilter.innerHTML = '<option value="">All Schools</option>';
+          modalSchool.innerHTML = '<option value="">Select School</option>';
 
-                            // Clear existing options
-                            provinceFilter.innerHTML = '<option value="">All Provinces</option>';
-                            modalProvince.innerHTML = '<option value="">Select Province</option>';
+          // Add schools to filters
+          allSchools.forEach((school) => {
+            const option = new Option(school.name, school.id);
+            const modalOption = new Option(school.name, school.id);
+            schoolFilter.appendChild(option);
+            modalSchool.appendChild(modalOption);
+          });
+        }
 
-                            // Add provinces to filters
-                            Object.keys(rwandaData).forEach(province => {
-                                const option = new Option(province, province);
-                                const modalOption = new Option(province, province);
-                                provinceFilter.appendChild(option);
-                                modalProvince.appendChild(modalOption);
-                            });
-                        }
+        // Populate province filters
+        function populateProvinceFilters() {
+          const provinceFilter = document.getElementById("provinceFilter");
+          const modalProvince = document.getElementById("modalProvince");
 
-                        // Update districts based on selected province
-                        function updateDistrictOptions(provinceSelect, districtSelect) {
-                            const selectedProvince = provinceSelect.value;
+          // Clear existing options
+          provinceFilter.innerHTML = '<option value="">All Provinces</option>';
+          modalProvince.innerHTML = '<option value="">Select Province</option>';
 
-                            // Clear existing options
-                            districtSelect.innerHTML = '<option value="">' +
-                                (districtSelect.id === "modalDistrict" ? 'Select District' : 'All Districts') +
-                                '</option>';
+          // Add provinces to filters
+          Object.keys(rwandaData).forEach((province) => {
+            const option = new Option(province, province);
+            const modalOption = new Option(province, province);
+            provinceFilter.appendChild(option);
+            modalProvince.appendChild(modalOption);
+          });
+        }
 
-                            // If a province is selected, add its districts
-                            if (selectedProvince && rwandaData[selectedProvince]) {
-                                rwandaData[selectedProvince].forEach(district => {
-                                    const option = new Option(district, district);
-                                    districtSelect.appendChild(option);
-                                });
-                            }
-                        }
+        // Update districts based on selected province
+        function updateDistrictOptions(provinceSelect, districtSelect) {
+          const selectedProvince = provinceSelect.value;
 
-                        // Update schools based on selected district
-                        function updateSchoolOptions(provinceSelect, districtSelect, schoolSelect) {
-                            const selectedProvince = provinceSelect.value;
-                            const selectedDistrict = districtSelect.value;
+          // Clear existing options
+          districtSelect.innerHTML =
+            '<option value="">' +
+            (districtSelect.id === "modalDistrict"
+              ? "Select District"
+              : "All Districts") +
+            "</option>";
 
-                            // Clear existing options
-                            schoolSelect.innerHTML = '<option value="">' +
-                                (schoolSelect.id === "modalSchool" ? 'Select School' : 'All Schools') +
-                                '</option>';
+          // If a province is selected, add its districts
+          if (selectedProvince && rwandaData[selectedProvince]) {
+            rwandaData[selectedProvince].forEach((district) => {
+              const option = new Option(district, district);
+              districtSelect.appendChild(option);
+            });
+          }
+        }
 
-                            // If both province and district are selected, filter schools
-                            if (selectedProvince && selectedDistrict) {
-                                const filteredSchools = allSchools.filter(school =>
-                                    school.province === selectedProvince &&
-                                    school.district === selectedDistrict
-                                );
+        // Update schools based on selected district
+        function updateSchoolOptions(
+          provinceSelect,
+          districtSelect,
+          schoolSelect
+        ) {
+          const selectedProvince = provinceSelect.value;
+          const selectedDistrict = districtSelect.value;
 
-                                filteredSchools.forEach(school => {
-                                    const option = new Option(school.name, school.id);
-                                    schoolSelect.appendChild(option);
-                                });
-                            }
-                        }
+          // Clear existing options
+          schoolSelect.innerHTML =
+            '<option value="">' +
+            (schoolSelect.id === "modalSchool"
+              ? "Select School"
+              : "All Schools") +
+            "</option>";
 
-                        // Fetch all devices
-                        async function fetchDevices() {
-                            try {
-                                const token = localStorage.getItem("accessToken");
-                                if (!token) {
-                                    window.location.href = "/login/";
-                                    return;
-                                }
+          // If both province and district are selected, filter schools
+          if (selectedProvince && selectedDistrict) {
+            const filteredSchools = allSchools.filter(
+              (school) =>
+                school.province === selectedProvince &&
+                school.district === selectedDistrict
+            );
 
-                                const response = await fetch("/device/devices/", {
-                                    method: "GET",
-                                    headers: {
-                                        "Authorization": `Bearer ${token}`,
-                                        "Content-Type": "application/json"
-                                    }
-                                });
+            filteredSchools.forEach((school) => {
+              const option = new Option(school.name, school.id);
+              schoolSelect.appendChild(option);
+            });
+          }
+        }
 
+        // Fetch all devices
+        async function fetchDevices() {
+          try {
+            const token = localStorage.getItem("accessToken");
+            if (!token) {
+              window.location.href = "/login/";
+              return;
+            }
 
+            const response = await fetch("/device/devices/", {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            });
 
-                                allDevices = await response.json();
-                                filteredDevices = [...allDevices];
-                                applyFilters();
-                                renderDevicesTable();
-                            } catch (error) {
-                                console.error("Error fetching devices:", error);
-                                showAlert("Failed to load devices data. Please try again.", "error");
-                            }
-                        }
+            allDevices = await response.json();
+            filteredDevices = [...allDevices];
+            applyFilters();
+            renderDevicesTable();
+          } catch (error) {
+            console.error("Error fetching devices:", error);
+            showAlert(
+              "Failed to load devices data. Please try again.",
+              "error"
+            );
+          }
+        }
 
-                        // Apply filters to devices
-                        function applyFilters() {
-                            const provinceFilter = document.getElementById("provinceFilter").value;
-                            const districtFilter = document.getElementById("districtFilter").value;
-                            const schoolFilter = document.getElementById("schoolFilter").value;
-                            const deviceTypeFilter = document.getElementById("deviceTypeFilter").value;
-                            const statusFilter = document.getElementById("statusFilter").value;
+        // Apply filters to devices
+        function applyFilters() {
+          const provinceFilter =
+            document.getElementById("provinceFilter").value;
+          const districtFilter =
+            document.getElementById("districtFilter").value;
+          const schoolFilter = document.getElementById("schoolFilter").value;
+          const deviceTypeFilter =
+            document.getElementById("deviceTypeFilter").value;
+          const statusFilter = document.getElementById("statusFilter").value;
 
-                            filteredDevices = allDevices.filter(device => {
-                                // Get the school details from the device
-                                const school = device.school;
+          filteredDevices = allDevices.filter((device) => {
+            // Get the school details from the device
+            const school = device.school;
 
-                                // Apply province filter
-                                if (provinceFilter && school.province !== provinceFilter) return false;
+            // Apply province filter
+            if (provinceFilter && school.province !== provinceFilter)
+              return false;
 
-                                // Apply district filter
-                                if (districtFilter && school.district !== districtFilter) return false;
+            // Apply district filter
+            if (districtFilter && school.district !== districtFilter)
+              return false;
 
-                                // Apply school filter
-                                if (schoolFilter && school.id !== parseInt(schoolFilter)) return false;
+            // Apply school filter
+            if (schoolFilter && school.id !== parseInt(schoolFilter))
+              return false;
 
-                                // Apply device type filter
-                                if (deviceTypeFilter && device.type !== deviceTypeFilter) return false;
+            // Apply device type filter
+            if (deviceTypeFilter && device.type !== deviceTypeFilter)
+              return false;
 
-                                // Apply status filter
-                                if (statusFilter && device.status !== statusFilter) return false;
+            // Apply status filter
+            if (statusFilter && device.status !== statusFilter) return false;
 
-                                return true;
-                            });
+            return true;
+          });
 
-                            // Reset to first page when filters change
-                            currentPage = 1;
-                            renderDevicesTable();
-                        }
+          // Reset to first page when filters change
+          currentPage = 1;
+          renderDevicesTable();
+        }
 
-                        // Render devices table
-                        function renderDevicesTable() {
-                            const tableBody = document.getElementById("devicesTableBody");
-                            const paginationInfo = document.getElementById("paginationInfo");
-                            const prevPageBtn = document.getElementById("prevPageBtn");
-                            const nextPageBtn = document.getElementById("nextPageBtn");
+        // Render devices table
+        function renderDevicesTable() {
+          const tableBody = document.getElementById("devicesTableBody");
+          const paginationInfo = document.getElementById("paginationInfo");
+          const prevPageBtn = document.getElementById("prevPageBtn");
+          const nextPageBtn = document.getElementById("nextPageBtn");
 
-                            // Calculate pagination
-                            const totalItems = filteredDevices.length;
-                            const totalPages = Math.ceil(totalItems / pageSize);
-                            const startIndex = (currentPage - 1) * pageSize;
-                            const endIndex = Math.min(startIndex + pageSize, totalItems);
-                            const currentPageItems = filteredDevices.slice(startIndex, endIndex);
+          // Calculate pagination
+          const totalItems = filteredDevices.length;
+          const totalPages = Math.ceil(totalItems / pageSize);
+          const startIndex = (currentPage - 1) * pageSize;
+          const endIndex = Math.min(startIndex + pageSize, totalItems);
+          const currentPageItems = filteredDevices.slice(startIndex, endIndex);
 
-                            // Update pagination info
-                            paginationInfo.textContent = `Page ${currentPage} of ${totalPages || 1}`;
+          // Update pagination info
+          paginationInfo.textContent = `Page ${currentPage} of ${
+            totalPages || 1
+          }`;
 
-                            // Update pagination buttons
-                            prevPageBtn.disabled = currentPage === 1;
-                            nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
+          // Update pagination buttons
+          prevPageBtn.disabled = currentPage === 1;
+          nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
 
-                            // Clear table body
-                            tableBody.innerHTML = "";
+          // Clear table body
+          tableBody.innerHTML = "";
 
-                            // Check if there are no devices
-                            if (currentPageItems.length === 0) {
-                                tableBody.innerHTML = `
+          // Check if there are no devices
+          if (currentPageItems.length === 0) {
+            tableBody.innerHTML = `
                             <tr>
                                 <td colspan="7" class="px-6 py-4 text-center text-gray-500">
                                     No devices found matching your filters.
                                 </td>
                             </tr>
                         `;
-                                return;
-                            }
-
-                            // Render devices
-                            currentPageItems.forEach(device => {
-                                const row = document.createElement("tr");
-                                row.className = "hover:bg-gray-50";
-
-                                // Format date for display
-                                const lastConnectivity = device.last_connectivity
-                                    ? new Date(device.last_connectivity).toLocaleString()
-                                    : "Never";
-
-                                // Get status badge class
-                                const statusClass = {
-                                    'online': 'status-online',
-                                    'offline': 'status-offline'
-                                }[device.status] || 'status-error';
-
-                                // Get status label
-                                const statusLabel = {
-                                    'online': 'Online',
-                                    'offline': 'Offline'
-                                }[device.status] || 'Unknown';
-
-                                row.innerHTML = `
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="font-medium text-gray-900">${device.name}</div>
-                                <div class="text-sm text-gray-500">${device.mac_address}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">${device.type.charAt(0).toUpperCase() + device.type.slice(1)}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">${device.school.name}</div>
-                                <div class="text-xs text-gray-500">${device.school.province}, ${device.school.district}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">${device.ip_address}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-          <i class="fas fa-wifi ${device.status === 'online' ? 'text-green-500' : 'text-red-500'}"></i>
-      </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                ${lastConnectivity}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button class="table-action-btn view" data-id="${device.id}" title="View Details">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="table-action-btn edit" data-id="${device.id}" title="Edit Device">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="table-action-btn delete" data-id="${device.id}" title="Delete Device">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </td>
-                        `;
-
-                                tableBody.appendChild(row);
-                            });
-
-                            // Add event listeners to the action buttons
-                            document.querySelectorAll(".table-action-btn.view").forEach(btn => {
-                                btn.addEventListener("click", () => viewDeviceDetails(btn.dataset.id));
-                            });
-
-                            document.querySelectorAll(".table-action-btn.edit").forEach(btn => {
-                                btn.addEventListener("click", () => editDevice(btn.dataset.id));
-                            });
-
-                            document.querySelectorAll(".table-action-btn.delete").forEach(btn => {
-                                btn.addEventListener("click", () => showDeleteConfirmation(btn.dataset.id));
-                            });
-                        }
-
-                        // Show alert message
-                        function showAlert(message, type) {
-                            alertMessage.className = `alert ${type === 'error' ? 'alert-error' : 'alert-success'}`;
-                            alertMessage.textContent = message;
-                            alertMessage.classList.remove("hidden");
-
-                            // Hide after 5 seconds
-                            setTimeout(() => {
-                                alertMessage.classList.add("hidden");
-                            }, 5000);
-                        }
-
-                        // View device details
-                        async function viewDeviceDetails(deviceId) {
-                            try {
-                                const token = localStorage.getItem("accessToken");
-                                const response = await fetch(`/device/${deviceId}/`, {
-                                    method: "GET",
-                                    headers: {
-                                        "Authorization": `Bearer ${token}`,
-                                        "Content-Type": "application/json"
-                                    }
-                                });
-
-                                if (!response.ok) throw new Error("Failed to fetch device details");
-
-                                const device = await response.json();
-
-                                // Populate details modal
-                                document.getElementById("detailDeviceName").textContent = device.name;
-                                document.getElementById("detailDeviceType").textContent = device.type.charAt(0).toUpperCase() + device.type.slice(1);
-                                document.getElementById("detailDeviceStatus").textContent = device.status;
-                                document.getElementById("detailDeviceStatus").className = `status-badge ${device.status === 'online' ? 'status-online' : device.status === 'offline' ? 'status-offline' : device.status === 'no_internet' ? 'status-no-internet' : 'status-error'}`;
-                                document.getElementById("detailMacAddress").textContent = device.mac_address;
-                                document.getElementById("detailIpAddress").textContent = device.ip_address;
-                                document.getElementById("detailSchool").textContent = device.school.name;
-                                document.getElementById("detailCreatedBy").textContent = device.created_by.phone_number || "N/A";
-                                document.getElementById("detailCreatedAt").textContent = device.created_at ? new Date(device.created_at).toLocaleString() : "N/A";
-                                document.getElementById("detailLastConnectivity").textContent = device.last_connectivity ? new Date(device.last_connectivity).toLocaleString() : "Never";
-                                document.getElementById("detailLastCheckAttempt").textContent = device.last_check_attempt ? new Date(device.last_check_attempt).toLocaleString() : "Never";
-                                document.getElementById("detailCheckPorts").textContent = device.check_ports || "Default";
-                                document.getElementById("detailUsePingFallback").textContent = device.use_ping_fallback ? "Yes" : "No";
-                                document.getElementById("detailConnectivityStatus").textContent = device.status;
-                                document.getElementById("detailConnectivityError").textContent = device.error_message || "None";
-
-                                // Show the modal
-                                deviceDetailsModal.style.display = "block";
-                            } catch (error) {
-                                console.error("Error fetching device details:", error);
-                                showAlert("Failed to load device details. Please try again.", "error");
-                            }
-                        }
-
-                        // Edit device
-                        async function editDevice(deviceId) {
-                            try {
-                                const token = localStorage.getItem("accessToken");
-                                const response = await fetch(`/device/${deviceId}/`, {
-                                    method: "GET",
-                                    headers: {
-                                        "Authorization": `Bearer ${token}`,
-                                        "Content-Type": "application/json"
-                                    }
-                                });
-
-                                if (!response.ok) throw new Error("Failed to fetch device details");
-
-                                const device = await response.json();
-
-                                // Set form fields
-                                document.getElementById("deviceId").value = device.id;
-                                document.getElementById("deviceName").value = device.name;
-                                document.getElementById("deviceType").value = device.type;
-                                document.getElementById("macAddress").value = device.mac_address;
-                                document.getElementById("ipAddress").value = device.ip_address;
-
-                                // Set school-related fields
-                                document.getElementById("modalProvince").value = device.school.province;
-
-                                // Update districts based on selected province
-                                updateDistrictOptions(
-                                    document.getElementById("modalProvince"),
-                                    document.getElementById("modalDistrict")
-                                );
-
-                                // Set district after options are updated
-                                document.getElementById("modalDistrict").value = device.school.district;
-
-                                // Update schools based on selected district
-                                updateSchoolOptions(
-                                    document.getElementById("modalProvince"),
-                                    document.getElementById("modalDistrict"),
-                                    document.getElementById("modalSchool")
-                                );
-
-                                // Set school after options are updated
-                                document.getElementById("modalSchool").value = device.school.id;
-
-                                // Update modal title
-                                document.getElementById("deviceModalTitle").textContent = "Edit Device";
-
-                                // Show the modal
-                                deviceModal.style.display = "block";
-                                currentDeviceId = device.id;
-                            } catch (error) {
-                                console.error("Error fetching device details:", error);
-                                showAlert("Failed to load device details. Please try again.", "error");
-                            }
-                        }
-
-                        // Show delete confirmation
-                        function showDeleteConfirmation(deviceId) {
-                            currentDeviceId = deviceId;
-                            deleteConfirmModal.style.display = "block";
-                        }
-
-                        // Delete device
-                        async function deleteDevice() {
-                            try {
-                                const token = localStorage.getItem("accessToken");
-                                const response = await fetch(`/device/delete/${currentDeviceId}/`, {
-                                    method: "DELETE",
-                                    headers: {
-                                        "Authorization": `Bearer ${token}`,
-                                        "Content-Type": "application/json"
-                                    }
-                                });
-
-                                if (!response.ok) throw new Error("Failed to delete device");
-
-                                // Close the modal
-                                deleteConfirmModal.style.display = "none";
-
-                                // Show success message
-                                showAlert("Device deleted successfully!", "success");
-
-                                // Refresh devices
-                                fetchDevices();
-                            } catch (error) {
-                                console.error("Error deleting device:", error);
-                                showAlert("Failed to delete device. Please try again.", "error");
-                            }
-                        }
-
-                        // Save device (create or update)
-                        async function saveDevice(event) {
-                            event.preventDefault();
-
-                            // Get form values
-                            const deviceId = document.getElementById("deviceId").value;
-                            const deviceName = document.getElementById("deviceName").value;
-                            const deviceType = document.getElementById("deviceType").value;
-                            const macAddress = document.getElementById("macAddress").value;
-                            const ipAddress = document.getElementById("ipAddress").value;
-                            const schoolId = document.getElementById("modalSchool").value;
-
-                            // Validation
-                            if (!deviceName || !deviceType || !macAddress || !ipAddress || !schoolId) {
-                                showAlert("Please fill in all required fields.", "error");
-                                return;
-                            }
-
-                            try {
-                                const token = localStorage.getItem("accessToken");
-                                const method = deviceId ? "PUT" : "POST";
-                                const url = deviceId ? `/device/update/${deviceId}/` : "/device/create/";
-
-                                const response = await fetch(url, {
-                                    method: method,
-                                    headers: {
-                                        "Authorization": `Bearer ${token}`,
-                                        "Content-Type": "application/json"
-                                    },
-                                    body: JSON.stringify({
-                                        name: deviceName,
-                                        type: deviceType,
-                                        mac_address: macAddress,
-                                        ip_address: ipAddress,
-                                        school_id: parseInt(schoolId)
-                                    })
-                                });
-
-                                if (!response.ok) throw new Error("Failed to save device");
-
-                                // Close the modal
-                                deviceModal.style.display = "none";
-
-                                // Show success message
-                                showAlert(`Device ${deviceId ? "updated" : "created"} successfully!`, "success");
-
-                                // Reset form
-                                document.getElementById("deviceForm").reset();
-                                document.getElementById("deviceId").value = "";
-
-                                // Refresh devices
-                                fetchDevices();
-                            } catch (error) {
-                                console.error("Error saving device:", error);
-                                showAlert("Failed to save device. Please try again.", "error");
-                            }
-                        }
-
-                        // Event listeners
-                        document.getElementById("addDeviceBtn").addEventListener("click", () => {
-                            // Reset form
-                            document.getElementById("deviceForm").reset();
-                            document.getElementById("deviceId").value = "";
-
-                            // Update modal title
-                            document.getElementById("deviceModalTitle").textContent = "Add New Device";
-
-                            // Show the modal
-                            deviceModal.style.display = "block";
-                        });
-
-                        document.getElementById("closeDeviceModal").addEventListener("click", () => {
-                            deviceModal.style.display = "none";
-                        });
-
-                        document.getElementById("cancelDeviceBtn").addEventListener("click", () => {
-                            deviceModal.style.display = "none";
-                        });
-
-                        document.getElementById("closeDeviceDetailsModal").addEventListener("click", () => {
-                            deviceDetailsModal.style.display = "none";
-                        });
-
-                        document.getElementById("closeDeleteConfirmModal").addEventListener("click", () => {
-                            deleteConfirmModal.style.display = "none";
-                        });
-
-                        document.getElementById("cancelDeleteBtn").addEventListener("click", () => {
-                            deleteConfirmModal.style.display = "none";
-                        });
-
-                        document.getElementById("confirmDeleteBtn").addEventListener("click", deleteDevice);
-
-                        document.getElementById("deviceForm").addEventListener("submit", saveDevice);
-
-                        // Filter change listeners
-                        document.getElementById("provinceFilter").addEventListener("change", function () {
-                            updateDistrictOptions(this, document.getElementById("districtFilter"));
-                            applyFilters();
-                        });
-
-                        document.getElementById("districtFilter").addEventListener("change", function () {
-                            applyFilters();
-                        });
-
-                        document.getElementById("schoolFilter").addEventListener("change", function () {
-                            applyFilters();
-                        });
-
-                        document.getElementById("deviceTypeFilter").addEventListener("change", function () {
-                            applyFilters();
-                        });
-
-                        document.getElementById("statusFilter").addEventListener("change", function () {
-                            applyFilters();
-                        });
-
-                        // Modal province/district change listeners
-                        document.getElementById("modalProvince").addEventListener("change", function () {
-                            updateDistrictOptions(this, document.getElementById("modalDistrict"));
-                            document.getElementById("modalSchool").innerHTML = '<option value="">Select School</option>';
-                        });
-
-                        document.getElementById("modalDistrict").addEventListener("change", function () {
-                            updateSchoolOptions(
-                                document.getElementById("modalProvince"),
-                                this,
-                                document.getElementById("modalSchool")
-                            );
-                        });
-
-                        // Pagination controls
-                        document.getElementById("prevPageBtn").addEventListener("click", function () {
-                            if (currentPage > 1) {
-                                currentPage--;
-                                renderDevicesTable();
-                            }
-                        });
-
-                        document.getElementById("nextPageBtn").addEventListener("click", function () {
-                            const totalPages = Math.ceil(filteredDevices.length / pageSize);
-                            if (currentPage < totalPages) {
-                                currentPage++;
-                                renderDevicesTable();
-                            }
-                        });
-
-                        document.getElementById("pageSizeSelect").addEventListener("change", function () {
-                            pageSize = parseInt(this.value);
-                            currentPage = 1;
-                            renderDevicesTable();
-                        });
-
-                        // Initialize the page
-
-                        fetchSchools();
-                        fetchDevices();
-                    });
+            return;
+          }
+
+          // Render devices
+          currentPageItems.forEach((device) => {
+            const row = document.createElement("tr");
+            row.className = "hover:bg-gray-50";
+
+            // Format date for display
+            const lastConnectivity = device.last_connectivity
+              ? new Date(device.last_connectivity).toLocaleString()
+              : "Never";
+
+            // Get status badge class
+            const statusClass =
+              {
+                online: "status-online",
+                offline: "status-offline",
+              }[device.status] || "status-error";
+
+            // Get status label
+            const statusLabel =
+              {
+                online: "Online",
+                offline: "Offline",
+              }[device.status] || "Unknown";
+
+            // Replace the existing row.innerHTML in your renderDevicesTable function with this code
+
+            row.innerHTML = `
+            <td class="px-6 py-4 whitespace-nowrap">
+                <div class="font-medium text-gray-900">${device.name}</div>
+                <div class="text-sm text-gray-500">${device.mac_address}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">${device.type.charAt(0).toUpperCase() + device.type.slice(1)}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">${device.school.name}</div>
+                <div class="text-xs text-gray-500">${device.school.province}, ${device.school.district}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">${device.ip_address}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                ${device.connectivity_details?.metrics?.latency_ms !== undefined
+                    ? `<div class="text-sm text-gray-900">${parseFloat(device.connectivity_details.metrics.latency_ms).toFixed(3)} m/s</div>` 
+                    : `<div class="text-sm text-gray-500">0 m/s</div>`}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                    <i class="fas fa-wifi ${device.status === "online" ? "text-green-500" : "text-red-500"}"></i>
+                    <span class="ml-2 text-sm">${device.status === "online" ? "Online" : "Offline"}</span>
+                </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                ${lastConnectivity}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <button class="table-action-btn view" data-id="${device.id}" title="View Details">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button class="table-action-btn edit" data-id="${device.id}" title="Edit Device">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="table-action-btn delete" data-id="${device.id}" title="Delete Device">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </td>
+            `;
+            
+
+            tableBody.appendChild(row);
+          });
+
+          // Add event listeners to the action buttons
+          document.querySelectorAll(".table-action-btn.view").forEach((btn) => {
+            btn.addEventListener("click", () =>
+              viewDeviceDetails(btn.dataset.id)
+            );
+          });
+
+          document.querySelectorAll(".table-action-btn.edit").forEach((btn) => {
+            btn.addEventListener("click", () => editDevice(btn.dataset.id));
+          });
+
+          document
+            .querySelectorAll(".table-action-btn.delete")
+            .forEach((btn) => {
+              btn.addEventListener("click", () =>
+                showDeleteConfirmation(btn.dataset.id)
+              );
+            });
+        }
+
+        // Show alert message
+        function showAlert(message, type) {
+          alertMessage.className = `alert ${
+            type === "error" ? "alert-error" : "alert-success"
+          }`;
+          alertMessage.textContent = message;
+          alertMessage.classList.remove("hidden");
+
+          // Hide after 5 seconds
+          setTimeout(() => {
+            alertMessage.classList.add("hidden");
+          }, 5000);
+        }
+
+        // View device details
+        // Update the viewDeviceDetails function to include connectivity metrics
+
+        async function viewDeviceDetails(deviceId) {
+          try {
+            const token = localStorage.getItem("accessToken");
+            const response = await fetch(`/device/${deviceId}/`, {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            });
+
+            if (!response.ok) throw new Error("Failed to fetch device details");
+
+            const device = await response.json();
+
+            // Basic device info
+            document.getElementById("detailDeviceName").textContent =
+              device.name;
+            document.getElementById("detailDeviceType").textContent =
+              device.type.charAt(0).toUpperCase() + device.type.slice(1);
+            document.getElementById("detailDeviceStatus").textContent =
+              device.status;
+            document.getElementById(
+              "detailDeviceStatus"
+            ).className = `status-badge ${
+              device.status === "online"
+                ? "status-online"
+                : device.status === "offline"
+                ? "status-offline"
+                : device.status === "no_internet"
+                ? "status-no-internet"
+                : "status-error"
+            }`;
+            document.getElementById("detailMacAddress").textContent =
+              device.mac_address;
+            document.getElementById("detailIpAddress").textContent =
+              device.ip_address;
+            document.getElementById("detailSchool").textContent =
+              device.school.name;
+            document.getElementById("detailCreatedBy").textContent =
+              device.created_by.phone_number || "N/A";
+            document.getElementById("detailCreatedAt").textContent =
+              device.created_at
+                ? new Date(device.created_at).toLocaleString()
+                : "N/A";
+            document.getElementById("detailLastConnectivity").textContent =
+              device.last_connectivity
+                ? new Date(device.last_connectivity).toLocaleString()
+                : "Never";
+            document.getElementById("detailLastCheckAttempt").textContent =
+              device.last_check_attempt
+                ? new Date(device.last_check_attempt).toLocaleString()
+                : "Never";
+            document.getElementById("detailCheckPorts").textContent =
+              device.check_ports || "Default";
+            document.getElementById("detailUsePingFallback").textContent =
+              device.use_ping_fallback ? "Yes" : "No";
+
+            // Connectivity metrics
+            const connectivityDetails = device.connectivity_details || {};
+            const metrics = connectivityDetails.metrics || {};
+            const pingMetrics = connectivityDetails.ping_metrics || {};
+            const portMetrics = connectivityDetails.port_metrics || {};
+
+            // Update connectivity status details
+            document.getElementById("detailConnectivityStatus").textContent =
+              device.status;
+            document.getElementById("detailConnectivityError").textContent =
+              device.connectivity_error || connectivityDetails.error || "None";
+
+            // Update latency information
+            const latencyElement = document.getElementById("detailLatency");
+            if (latencyElement) {
+              const latency = metrics.latency_ms || pingMetrics.latency_ms;
+              latencyElement.textContent = latency ? `${latency} m/s` : "0 m/s";
+            }
+
+            // Update packet loss information
+            const packetLossElement =
+              document.getElementById("detailPacketLoss");
+            if (packetLossElement) {
+              const packetLoss = metrics.packet_loss || pingMetrics.packet_loss;
+              packetLossElement.textContent =
+                packetLoss !== null && packetLoss !== undefined
+                  ? `${packetLoss}%`
+                  : "N/A";
+            }
+
+            // Update ports information
+            const portsElement = document.getElementById("detailOpenPorts");
+            if (portsElement) {
+              const openPorts =
+                metrics.open_ports || (portMetrics && portMetrics.open_ports);
+              portsElement.textContent =
+                openPorts && openPorts.length ? openPorts.join(", ") : "None";
+            }
+
+            // Update status detail
+            const statusDetailElement =
+              document.getElementById("detailStatusDetail");
+            if (statusDetailElement) {
+              statusDetailElement.textContent =
+                connectivityDetails.status_detail || "N/A";
+            }
+
+            // Show the modal
+            deviceDetailsModal.style.display = "block";
+          } catch (error) {
+            console.error("Error fetching device details:", error);
+            showAlert(
+              "Failed to load device details. Please try again.",
+              "error"
+            );
+          }
+        }
+
+        // Edit device
+        async function editDevice(deviceId) {
+          try {
+            const token = localStorage.getItem("accessToken");
+            const response = await fetch(`/device/${deviceId}/`, {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            });
+
+            if (!response.ok) throw new Error("Failed to fetch device details");
+
+            const device = await response.json();
+
+            // Set form fields
+            document.getElementById("deviceId").value = device.id;
+            document.getElementById("deviceName").value = device.name;
+            document.getElementById("deviceType").value = device.type;
+            document.getElementById("macAddress").value = device.mac_address;
+            document.getElementById("ipAddress").value = device.ip_address;
+
+            // Set school-related fields
+            document.getElementById("modalProvince").value =
+              device.school.province;
+
+            // Update districts based on selected province
+            updateDistrictOptions(
+              document.getElementById("modalProvince"),
+              document.getElementById("modalDistrict")
+            );
+
+            // Set district after options are updated
+            document.getElementById("modalDistrict").value =
+              device.school.district;
+
+            // Update schools based on selected district
+            updateSchoolOptions(
+              document.getElementById("modalProvince"),
+              document.getElementById("modalDistrict"),
+              document.getElementById("modalSchool")
+            );
+
+            // Set school after options are updated
+            document.getElementById("modalSchool").value = device.school.id;
+
+            // Update modal title
+            document.getElementById("deviceModalTitle").textContent =
+              "Edit Device";
+
+            // Show the modal
+            deviceModal.style.display = "block";
+            currentDeviceId = device.id;
+          } catch (error) {
+            console.error("Error fetching device details:", error);
+            showAlert(
+              "Failed to load device details. Please try again.",
+              "error"
+            );
+          }
+        }
+
+        // Show delete confirmation
+        function showDeleteConfirmation(deviceId) {
+          currentDeviceId = deviceId;
+          deleteConfirmModal.style.display = "block";
+        }
+
+        // Delete device
+        async function deleteDevice() {
+          try {
+            const token = localStorage.getItem("accessToken");
+            const response = await fetch(`/device/delete/${currentDeviceId}/`, {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            });
+
+            if (!response.ok) throw new Error("Failed to delete device");
+
+            // Close the modal
+            deleteConfirmModal.style.display = "none";
+
+            // Show success message
+            showAlert("Device deleted successfully!", "success");
+
+            // Refresh devices
+            fetchDevices();
+          } catch (error) {
+            console.error("Error deleting device:", error);
+            showAlert("Failed to delete device. Please try again.", "error");
+          }
+        }
+
+        // Save device (create or update)
+        async function saveDevice(event) {
+          event.preventDefault();
+
+          // Get form values
+          const deviceId = document.getElementById("deviceId").value;
+          const deviceName = document.getElementById("deviceName").value;
+          const deviceType = document.getElementById("deviceType").value;
+          const macAddress = document.getElementById("macAddress").value;
+          const ipAddress = document.getElementById("ipAddress").value;
+          const schoolId = document.getElementById("modalSchool").value;
+
+          // Validation
+          if (
+            !deviceName ||
+            !deviceType ||
+            !macAddress ||
+            !ipAddress ||
+            !schoolId
+          ) {
+            showAlert("Please fill in all required fields.", "error");
+            return;
+          }
+
+          try {
+            const token = localStorage.getItem("accessToken");
+            const method = deviceId ? "PUT" : "POST";
+            const url = deviceId
+              ? `/device/update/${deviceId}/`
+              : "/device/create/";
+
+            const response = await fetch(url, {
+              method: method,
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                name: deviceName,
+                type: deviceType,
+                mac_address: macAddress,
+                ip_address: ipAddress,
+                school_id: parseInt(schoolId),
+              }),
+            });
+
+            if (!response.ok) throw new Error("Failed to save device");
+
+            // Close the modal
+            deviceModal.style.display = "none";
+
+            // Show success message
+            showAlert(
+              `Device ${deviceId ? "updated" : "created"} successfully!`,
+              "success"
+            );
+
+            // Reset form
+            document.getElementById("deviceForm").reset();
+            document.getElementById("deviceId").value = "";
+
+            // Refresh devices
+            fetchDevices();
+          } catch (error) {
+            console.error("Error saving device:", error);
+            showAlert("Failed to save device. Please try again.", "error");
+          }
+        }
+
+        // Event listeners
+        document
+          .getElementById("addDeviceBtn")
+          .addEventListener("click", () => {
+            // Reset form
+            document.getElementById("deviceForm").reset();
+            document.getElementById("deviceId").value = "";
+
+            // Update modal title
+            document.getElementById("deviceModalTitle").textContent =
+              "Add New Device";
+
+            // Show the modal
+            deviceModal.style.display = "block";
+          });
+
+        document
+          .getElementById("closeDeviceModal")
+          .addEventListener("click", () => {
+            deviceModal.style.display = "none";
+          });
+
+        document
+          .getElementById("cancelDeviceBtn")
+          .addEventListener("click", () => {
+            deviceModal.style.display = "none";
+          });
+
+        document
+          .getElementById("closeDeviceDetailsModal")
+          .addEventListener("click", () => {
+            deviceDetailsModal.style.display = "none";
+          });
+
+        document
+          .getElementById("closeDeleteConfirmModal")
+          .addEventListener("click", () => {
+            deleteConfirmModal.style.display = "none";
+          });
+
+        document
+          .getElementById("cancelDeleteBtn")
+          .addEventListener("click", () => {
+            deleteConfirmModal.style.display = "none";
+          });
+
+        document
+          .getElementById("confirmDeleteBtn")
+          .addEventListener("click", deleteDevice);
+
+        document
+          .getElementById("deviceForm")
+          .addEventListener("submit", saveDevice);
+
+        // Filter change listeners
+        document
+          .getElementById("provinceFilter")
+          .addEventListener("change", function () {
+            updateDistrictOptions(
+              this,
+              document.getElementById("districtFilter")
+            );
+            applyFilters();
+          });
+
+        document
+          .getElementById("districtFilter")
+          .addEventListener("change", function () {
+            applyFilters();
+          });
+
+        document
+          .getElementById("schoolFilter")
+          .addEventListener("change", function () {
+            applyFilters();
+          });
+
+        document
+          .getElementById("deviceTypeFilter")
+          .addEventListener("change", function () {
+            applyFilters();
+          });
+
+        document
+          .getElementById("statusFilter")
+          .addEventListener("change", function () {
+            applyFilters();
+          });
+
+        // Modal province/district change listeners
+        document
+          .getElementById("modalProvince")
+          .addEventListener("change", function () {
+            updateDistrictOptions(
+              this,
+              document.getElementById("modalDistrict")
+            );
+            document.getElementById("modalSchool").innerHTML =
+              '<option value="">Select School</option>';
+          });
+
+        document
+          .getElementById("modalDistrict")
+          .addEventListener("change", function () {
+            updateSchoolOptions(
+              document.getElementById("modalProvince"),
+              this,
+              document.getElementById("modalSchool")
+            );
+          });
+
+        // Pagination controls
+        document
+          .getElementById("prevPageBtn")
+          .addEventListener("click", function () {
+            if (currentPage > 1) {
+              currentPage--;
+              renderDevicesTable();
+            }
+          });
+
+        document
+          .getElementById("nextPageBtn")
+          .addEventListener("click", function () {
+            const totalPages = Math.ceil(filteredDevices.length / pageSize);
+            if (currentPage < totalPages) {
+              currentPage++;
+              renderDevicesTable();
+            }
+          });
+
+        document
+          .getElementById("pageSizeSelect")
+          .addEventListener("change", function () {
+            pageSize = parseInt(this.value);
+            currentPage = 1;
+            renderDevicesTable();
+          });
+
+        // Initialize the page
+
+        fetchSchools();
+        fetchDevices();
+      });
     </script>
   </body>
 </html>
