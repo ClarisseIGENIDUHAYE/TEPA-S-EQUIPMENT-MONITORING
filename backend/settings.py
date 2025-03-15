@@ -20,7 +20,8 @@ SECRET_KEY = 'django-insecure-$r$1a$-tnaz2o8w*f_+x&+en6wz&mwn(m=44b+_5e!$%2^#uzh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'rafiki-project-7ppl.onrender.com']
+
 
 
 # Application definition
