@@ -7,4 +7,5 @@ urlpatterns = [
     path('', include('userApp.urls')),
     path('school/', include('schoolApp.urls')),
     path('device/', include('deviceApp.urls')),
+    path('router/', include('routerApp.urls')),
 ]

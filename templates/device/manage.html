@@ -460,8 +460,7 @@
         <a href="{% url 'index' %}" class="sidebar-item">
           <i class="fas fa-sign-out-alt"></i>
           Logout
-      </a>
-      
+        </a>
       </aside>
 
       <div class="content-area">
@@ -515,11 +514,14 @@
                 <select id="deviceTypeFilter" class="border rounded p-2 w-40">
                   <option value>All Types</option>
                   <option value="router">Router</option>
-                  <option value="phone">Phone</option>
+                  <option value="access_point">Access Point</option>
+                  {% comment %}
                   <option value="pc">PC</option>
+                  {% endcomment %} {% comment %}
                   <option value="laptop">Laptop</option>
                   <option value="tablet">Tablet</option>
                   <option value="other">Other</option>
+                  {% endcomment %}
                 </select>
               </div>
               <div>
@@ -608,7 +610,6 @@
                 </tbody>
               </table>
             </div>
-            
           </div>
 
           <!-- Pagination Controls -->
@@ -656,11 +657,13 @@
             <select id="deviceType" required>
               <option value>Select Type</option>
               <option value="router">Router</option>
-              <option value="phone">Phone</option>
+              <option value="access_point">Access point</option>
+              {% comment %}
               <option value="pc">PC</option>
               <option value="laptop">Laptop</option>
               <option value="tablet">Tablet</option>
               <option value="other">Other</option>
+              {% endcomment %}
             </select>
           </div>
           <div class="form-field">
@@ -1134,42 +1137,61 @@
                 <div class="text-sm text-gray-500">${device.mac_address}</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900">${device.type.charAt(0).toUpperCase() + device.type.slice(1)}</div>
+                <div class="text-sm text-gray-900">${
+                  device.type.charAt(0).toUpperCase() + device.type.slice(1)
+                }</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
                 <div class="text-sm text-gray-900">${device.school.name}</div>
-                <div class="text-xs text-gray-500">${device.school.province}, ${device.school.district}</div>
+                <div class="text-xs text-gray-500">${device.school.province}, ${
+              device.school.district
+            }</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
                 <div class="text-sm text-gray-900">${device.ip_address}</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-                ${device.connectivity_details?.metrics?.latency_ms !== undefined
-                    ? `<div class="text-sm text-gray-900">${parseFloat(device.connectivity_details.metrics.latency_ms).toFixed(3)} m/s</div>` 
-                    : `<div class="text-sm text-gray-500">0 m/s</div>`}
+                ${
+                  device.connectivity_details?.metrics?.latency_ms !== undefined
+                    ? `<div class="text-sm text-gray-900">${parseFloat(
+                        device.connectivity_details.metrics.latency_ms
+                      ).toFixed(3)} m/s</div>`
+                    : `<div class="text-sm text-gray-500">0 m/s</div>`
+                }
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
-                    <i class="fas fa-wifi ${device.status === "online" ? "text-green-500" : "text-red-500"}"></i>
-                    <span class="ml-2 text-sm">${device.status === "online" ? "Online" : "Offline"}</span>
+                    <i class="fas fa-wifi ${
+                      device.status === "online"
+                        ? "text-green-500"
+                        : "text-red-500"
+                    }"></i>
+                    <span class="ml-2 text-sm">${
+                      device.status === "online" ? "Online" : "Offline"
+                    }</span>
                 </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 ${lastConnectivity}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button class="table-action-btn view" data-id="${device.id}" title="View Details">
+                <button class="table-action-btn view" data-id="${
+                  device.id
+                }" title="View Details">
                     <i class="fas fa-eye"></i>
                 </button>
-                <button class="table-action-btn edit" data-id="${device.id}" title="Edit Device">
+                <button class="table-action-btn edit" data-id="${
+                  device.id
+                }" title="Edit Device">
                     <i class="fas fa-edit"></i>
                 </button>
-                <button class="table-action-btn delete" data-id="${device.id}" title="Delete Device">
+                <button class="table-action-btn delete" data-id="${
+                  device.id
+                }" title="Delete Device">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             </td>
             `;
-            
 
             tableBody.appendChild(row);
           });
@@ -1210,32 +1232,37 @@
 
         // View device details
         // Update the viewDeviceDetails function to include connectivity metrics
-
         async function viewDeviceDetails(deviceId) {
           try {
             const token = localStorage.getItem("accessToken");
-            const response = await fetch(`/device/${deviceId}/`, {
+        
+            // First fetch the basic device details
+            const deviceResponse = await fetch(`/device/${deviceId}/`, {
               method: "GET",
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
               },
             });
-
-            if (!response.ok) throw new Error("Failed to fetch device details");
-
-            const device = await response.json();
-
+        
+            if (!deviceResponse.ok)
+              throw new Error("Failed to fetch device details");
+            const device = await deviceResponse.json();
+        
+            // Check if the device type is 'access_point'
+            if (device.type === "access_point") {
+              // If it's an access point, redirect to the routers page
+              window.location.href = `/router/${deviceId}/routers/`;
+              return;
+            }
+        
+            // If it's not an access point (i.e., it's a router), continue with showing the modal
             // Basic device info
-            document.getElementById("detailDeviceName").textContent =
-              device.name;
+            document.getElementById("detailDeviceName").textContent = device.name;
             document.getElementById("detailDeviceType").textContent =
               device.type.charAt(0).toUpperCase() + device.type.slice(1);
-            document.getElementById("detailDeviceStatus").textContent =
-              device.status;
-            document.getElementById(
-              "detailDeviceStatus"
-            ).className = `status-badge ${
+            document.getElementById("detailDeviceStatus").textContent = device.status;
+            document.getElementById("detailDeviceStatus").className = `status-badge ${
               device.status === "online"
                 ? "status-online"
                 : device.status === "offline"
@@ -1244,12 +1271,9 @@
                 ? "status-no-internet"
                 : "status-error"
             }`;
-            document.getElementById("detailMacAddress").textContent =
-              device.mac_address;
-            document.getElementById("detailIpAddress").textContent =
-              device.ip_address;
-            document.getElementById("detailSchool").textContent =
-              device.school.name;
+            document.getElementById("detailMacAddress").textContent = device.mac_address;
+            document.getElementById("detailIpAddress").textContent = device.ip_address;
+            document.getElementById("detailSchool").textContent = device.school.name;
             document.getElementById("detailCreatedBy").textContent =
               device.created_by.phone_number || "N/A";
             document.getElementById("detailCreatedAt").textContent =
@@ -1268,29 +1292,28 @@
               device.check_ports || "Default";
             document.getElementById("detailUsePingFallback").textContent =
               device.use_ping_fallback ? "Yes" : "No";
-
+        
             // Connectivity metrics
             const connectivityDetails = device.connectivity_details || {};
             const metrics = connectivityDetails.metrics || {};
             const pingMetrics = connectivityDetails.ping_metrics || {};
             const portMetrics = connectivityDetails.port_metrics || {};
-
+        
             // Update connectivity status details
             document.getElementById("detailConnectivityStatus").textContent =
               device.status;
             document.getElementById("detailConnectivityError").textContent =
               device.connectivity_error || connectivityDetails.error || "None";
-
+        
             // Update latency information
             const latencyElement = document.getElementById("detailLatency");
             if (latencyElement) {
               const latency = metrics.latency_ms || pingMetrics.latency_ms;
               latencyElement.textContent = latency ? `${latency} m/s` : "0 m/s";
             }
-
+        
             // Update packet loss information
-            const packetLossElement =
-              document.getElementById("detailPacketLoss");
+            const packetLossElement = document.getElementById("detailPacketLoss");
             if (packetLossElement) {
               const packetLoss = metrics.packet_loss || pingMetrics.packet_loss;
               packetLossElement.textContent =
@@ -1298,7 +1321,7 @@
                   ? `${packetLoss}%`
                   : "N/A";
             }
-
+        
             // Update ports information
             const portsElement = document.getElementById("detailOpenPorts");
             if (portsElement) {
@@ -1307,15 +1330,14 @@
               portsElement.textContent =
                 openPorts && openPorts.length ? openPorts.join(", ") : "None";
             }
-
+        
             // Update status detail
-            const statusDetailElement =
-              document.getElementById("detailStatusDetail");
+            const statusDetailElement = document.getElementById("detailStatusDetail");
             if (statusDetailElement) {
               statusDetailElement.textContent =
                 connectivityDetails.status_detail || "N/A";
             }
-
+        
             // Show the modal
             deviceDetailsModal.style.display = "block";
           } catch (error) {
@@ -1326,6 +1348,8 @@
             );
           }
         }
+
+       
 
         // Edit device
         async function editDevice(deviceId) {

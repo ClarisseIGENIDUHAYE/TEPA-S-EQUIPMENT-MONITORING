@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'userApp',
     'schoolApp',
     'deviceApp',
+    'routerApp',
 ]
 
 MIDDLEWARE = [

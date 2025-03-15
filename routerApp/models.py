@@ -1,9 +1,9 @@
 from django.db import models
 from django.utils.timezone import now
-from schoolApp.models import School
 from userApp.models import CustomUser
 from datetime import datetime
 import json
+from deviceApp.models import Device
 
 from .utils import (
     check_device_connectivity_with_params,
@@ -11,22 +11,18 @@ from .utils import (
     is_valid_ipv4
 )
 
-class Device(models.Model):
-    DEVICE_TYPES = (
-        ('router', 'Router'),
-        ('access_point', 'Access Point'),
-        
-    )
+class Router(models.Model):
     
     name = models.CharField(max_length=255)
+    access_point = models.ForeignKey(Device, on_delete=models.CASCADE, related_name='access_point')
     mac_address = models.CharField(max_length=100, unique=True)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
-    type = models.CharField(max_length=50, choices=DEVICE_TYPES)
-    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='devices')
-    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='devices')
+    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='router')
     created_at = models.DateTimeField(default=now)
     last_updated = models.DateTimeField(auto_now=True)
     last_connectivity = models.DateTimeField(null=True, blank=True)
+    # Add the missing type field
+    type = models.CharField(max_length=100, default='router')
     
     # Connectivity settings
     check_ports = models.CharField(max_length=255, blank=True, null=True, 
@@ -44,11 +40,11 @@ class Device(models.Model):
     class Meta:
         ordering = ['-last_updated']
         unique_together = [
-            ('name', 'school', 'ip_address'),
+            ('name', 'ip_address'),
         ]
     
     def __str__(self):
-        return f"{self.name} ({self.type}) - {self.school.name}"
+        return f"{self.name} ({self.type}) - {self.access_point.name}"
     
     @property
     def status(self):
@@ -175,20 +171,20 @@ class Device(models.Model):
         
         return metrics
     
-    def bulk_check_devices(cls, school_id=None, device_type=None):
+    @classmethod  # Fixed: Changed from instance method to class method
+    def bulk_check_devices(cls, access_point_id=None, device_type=None):
         """
         Class method to check connectivity for multiple devices with filtering options
         
         Parameters:
-        - school_id: Optional filter by school
         - device_type: Optional filter by device type
         
         Returns:
         - Dictionary with summary and individual device results
         """
         filters = {}
-        if school_id:
-            filters['school_id'] = school_id
+        if access_point_id:
+            filters['access_point_id'] = access_point_id
         if device_type:
             filters['type'] = device_type
             
@@ -221,7 +217,7 @@ class Device(models.Model):
                 'type': device.type,
                 'status': device_result['status'],
                 'error': device_result.get('error'),
-                'school': device.school.name
+                'access_point': device.access_point.name
             }
             
             # Add latency if available
